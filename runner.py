@@ -85,6 +85,7 @@ def run():
     while traci.simulation.getMinExpectedNumber() > 0:
 #    while step < 1000:
         traci.simulationStep()
+        print(step)
         if traci.trafficlight.getPhase("0") == 2:
             # we are not already switching
             if traci.inductionloop.getLastStepVehicleNumber("0") > 0:
@@ -100,6 +101,12 @@ def run():
             pos[v] = traci.vehicle.getPosition(v)
             print(pos[v])
         print(vehs)
+        if step == 40:
+            print("We are in 40s")
+            if traci.vehicle.getSpeed("right_0") == 0:
+                traci.vehicle.resume("right_0")
+            traci.vehicle.changeTarget("right_0", "2o")
+#            traci.vehicle.setRouteID("right_0", "right")
         step += 1
     traci.close()
     sys.stdout.flush()
