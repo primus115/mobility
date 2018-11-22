@@ -109,8 +109,11 @@ def run():
         pos = {}
         for v in vehs:
             pos[v] = traci.vehicle.getPosition(v)
-            print(pos[v])
-        print(vehs)
+            topic = "pos/sloveni/ljubljana/" + v
+            payload = {"id":"0xCAR1", "lan":pos[v][0], "lat":pos[v][1]}
+            mqttClient.publish(topic, str(payload))
+#            print(pos[v])
+#        print(vehs)
 #        if step == 40:
         if message != "":
             message = ""
@@ -167,7 +170,7 @@ def main():
     mqttClient.on_connect = mqtt_on_connect
     mqttClient.on_message = mqtt_on_message
 
-    mqttClient.connect("localhost")
+    mqttClient.connect("178.62.252.50", port=1883, keepalive=60)
 
     # Loop forever
     try:
