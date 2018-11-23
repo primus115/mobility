@@ -15,6 +15,12 @@ import _MessageContainer from './MessageContainer';
 //  this.state = { counter: 0 };
 //  this.handleClick = this.handleClick.bind(this);
 //}
+//
+//			<div>map</div>
+//			<Map center={[46.056946, 14.505751]} zoom={14} width={1200} height={600}>
+//				<Marker anchor={[46.05, 14.50]} payload={1} onClick={this.handleMarkerClick} />
+//			</Map>
+
 
 const MessageContainer = subscribe({topic: 'pos/#'})(_MessageContainer);
 
@@ -23,12 +29,9 @@ class App extends Component {
     return (
       <Connector mqttProps="ws:178.62.252.50:9001">
       <div className="App">
-        <header className="App-header">
-			<div>map</div>
-			<Map center={[46.056946, 14.505751]} zoom={14} width={1200} height={600}>
-				<Marker anchor={[46.05, 14.50]} payload={1} onClick={this.handleMarkerClick} />
-			</Map>
+        <header>// className="App-header">
 		</header>
+        <MessageContainer/> 
       </div>
 	    </Connector>
     );

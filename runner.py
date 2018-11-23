@@ -25,6 +25,7 @@ import random
 
 import paho.mqtt.client as mqtt
 import time
+import json
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -110,8 +111,10 @@ def run():
         for v in vehs:
             pos[v] = traci.vehicle.getPosition(v)
             topic = "pos/sloveni/ljubljana/" + v
-            payload = {"id":"0xCAR1", "lan":pos[v][0], "lat":pos[v][1]}
-            mqttClient.publish(topic, str(payload))
+            payload = json.dumps({"id":"0xCAR1", "lon":pos[v][0], "lat":pos[v][1]})
+            print("fffff")
+            print(payload)
+            mqttClient.publish(topic, payload)
 #            print(pos[v])
 #        print(vehs)
 #        if step == 40:
