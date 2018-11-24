@@ -110,7 +110,7 @@ def run():
         pos = {}
         for v in vehs:
             pos[v] = traci.vehicle.getPosition(v)
-            topic = "pos/sloveni/ljubljana/" + v
+            topic = "pos/slovenia/ljubljana/" + v
             payload = json.dumps({"id":"0xCAR1", "lon":pos[v][0], "lat":pos[v][1]})
             print("fffff")
             print(payload)
@@ -123,14 +123,18 @@ def run():
             print("----------------------------------")
             print("We are in 40s")
             print("----------------------------------")
-#            if traci.vehicle.getSpeed("right_0") == 0:
-#                traci.vehicle.resume("right_0")
+            if traci.vehicle.getSpeed("right_0") == 0:
+                traci.vehicle.resume("right_0")
             # changeTarget(vehicleID, edgeID) - can make turns
 #            traci.vehicle.changeTarget("right_0", "04")
             # setRoute(self, vehID, edgeList) ex:setRoute('1', ['1', '2', '4'])
 #            traci.vehicle.setRoute("right_0", ["10", "03", "30"])
             # setRouteID(self, vehID, routeID)
 #            traci.vehicle.setRouteID("right_0", "down")
+#            print("findRoute", traci.simulation.findRoute("10", "40"))
+            route = traci.simulation.findRoute("10", "40").edges
+            traci.vehicle.setRoute("right_0", route)
+#            print(route)
         step += 1
     mqttClient.disconnect()
     mqttClient.loop_stop()
