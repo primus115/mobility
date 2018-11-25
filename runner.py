@@ -58,15 +58,21 @@ def run():
 #    while step < 1000:
         traci.simulationStep()
         print(step)
-#        vehList = traci.getIDList()
         vehs = traci.vehicle.getIDList()
+#        print(vehs)
         pos = {}
-        for v in vehs:
-            pos[v] = traci.vehicle.getPosition(v)
-            topic = "pos/sloveni/ljubljana/" + v
-            payload = json.dumps({"id":"0xCAR1", "lon":pos[v][0], "lat":pos[v][1]})
-            print("fffff")
-            print(payload)
+#        for v in vehs:
+        pos2D = traci.vehicle.getPosition("taxi1")
+        pos["taxi1"] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
+#        topic = "pos/sloveni/ljubljana/" + v
+        topic = "pos/sloveni/ljubljana/taxi1"
+        payload = json.dumps({"id":"taxi1", "lon":pos["taxi1"][0], "lat":pos["taxi1"][1]})
+
+#        print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
+        print("------------")
+        print(payload)
+        if(step%1 == 0):
+            print("nottttttttttttttttttttttttt")
             mqttClient.publish(topic, payload)
 #            print(pos[v])
 #        print(vehs)
