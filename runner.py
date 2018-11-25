@@ -40,77 +40,30 @@ import traci  # noqa
 global message
 message = ""
 
-def generate_routefile():
-    random.seed(42)  # make tests reproducible
-    N = 3600  # number of time steps
-    # demand per second from different directions
-    pWE = 1. / 10
-    pEW = 1. / 11
-    pNS = 1. / 30
-    with open("data/cross.rou.xml", "w") as routes:
-        print("""<routes>
-        <vType id="typeWE" accel="0.8" decel="4.5" sigma="0.5" length="5" minGap="2.5" maxSpeed="16.67" \
-guiShape="passenger"/>
-        <vType id="typeNS" accel="0.8" decel="4.5" sigma="0.5" length="7" minGap="3" maxSpeed="25" guiShape="bus"/>
-
-        <route id="right" edges="51o 1i 2o 52i" />
-        <route id="left" edges="52o 2i 1o 51i" />
-        <route id="down" edges="54o 4i 3o 53i" />""", file=routes)
-        vehNr = 0
-        for i in range(N):
-            if random.uniform(0, 1) < pWE:
-                print('    <vehicle id="right_%i" type="typeWE" route="right" depart="%i" />' % (
-                    vehNr, i), file=routes)
-                vehNr += 1
-            if random.uniform(0, 1) < pEW:
-                print('    <vehicle id="left_%i" type="typeWE" route="left" depart="%i" />' % (
-                    vehNr, i), file=routes)
-                vehNr += 1
-            if random.uniform(0, 1) < pNS:
-                print('    <vehicle id="down_%i" type="typeNS" route="down" depart="%i" color="1,0,0"/>' % (
-                    vehNr, i), file=routes)
-                vehNr += 1
-        print("</routes>", file=routes)
-
-# The program looks like this
-#    <tlLogic id="0" type="static" programID="0" offset="0">
-# the locations of the tls are      NESW
-#        <phase duration="31" state="GrGr"/>
-#        <phase duration="6"  state="yryr"/>
-#        <phase duration="31" state="rGrG"/>
-#        <phase duration="6"  state="ryry"/>
-#    </tlLogic>
-
-
 def run():
     global mqttClient
     global traci
     global message
     """execute the TraCI control loop"""
     step = 0
-    # we start with phase 2 where EW has green
-    traci.trafficlight.setPhase("0", 2)
+
+    route = traci.simulation.findRoute("3314142#3","3314142#4").edges
+    traci.route.add("taxi1Start", route)
+    traci.vehicle.add('taxi1', "taxi1Start")
+    traci.vehicle.setColor('taxi1', (255,0,0))
     # setStop(self, vehID, edgeID, pos=1.0, laneIndex=0...)
-    traci.vehicle.setStop("right_0", "10", 50.0, flags=traci.constants.STOP_PARKING)
-    traci.vehicle.setStop("left_0", "20", 50.0, flags=traci.constants.STOP_PARKING)
+    traci.vehicle.setStop("taxi1", "3314142#3", 5.0, flags=traci.constants.STOP_PARKING)
+
     while traci.simulation.getMinExpectedNumber() > 0:
 #    while step < 1000:
         traci.simulationStep()
         print(step)
-        if traci.trafficlight.getPhase("0") == 2:
-            # we are not already switching
-            if traci.inductionloop.getLastStepVehicleNumber("0") > 0:
-                # there is a vehicle from the north, switch
-                traci.trafficlight.setPhase("0", 3)
-            else:
-                # otherwise try to keep green for EW
-                traci.trafficlight.setPhase("0", 2)
 #        vehList = traci.getIDList()
         vehs = traci.vehicle.getIDList()
         pos = {}
         for v in vehs:
             pos[v] = traci.vehicle.getPosition(v)
-            topic = "pos/slovenia/ljubljana/" + v
+            topic = "pos/sloveni/ljubljana/" + v
             payload = json.dumps({"id":"0xCAR1", "lon":pos[v][0], "lat":pos[v][1]})
             print("fffff")
             print(payload)
@@ -123,18 +76,18 @@ def run():
             print("----------------------------------")
             print("We are in 40s")
             print("----------------------------------")
-            if traci.vehicle.getSpeed("right_0") == 0:
-                traci.vehicle.resume("right_0")
+#            if traci.vehicle.getSpeed("right_0") == 0:
+#                traci.vehicle.resume("right_0")
             # changeTarget(vehicleID, edgeID) - can make turns
 #            traci.vehicle.changeTarget("right_0", "04")
             # setRoute(self, vehID, edgeList) ex:setRoute('1', ['1', '2', '4'])
 #            traci.vehicle.setRoute("right_0", ["10", "03", "30"])
             # setRouteID(self, vehID, routeID)
 #            traci.vehicle.setRouteID("right_0", "down")
-#            print("findRoute", traci.simulation.findRoute("10", "40"))
-            route = traci.simulation.findRoute("10", "40").edges
-            traci.vehicle.setRoute("right_0", route)
-#            print(route)
+            if traci.vehicle.getSpeed("taxi1") == 0:
+                traci.vehicle.resume("taxi1")
+            newRoute = traci.simulation.findRoute("3314142#3", "72267225").edges
+            traci.vehicle.setRoute("taxi1", newRoute)
         step += 1
     mqttClient.disconnect()
     mqttClient.loop_stop()
