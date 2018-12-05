@@ -47,12 +47,34 @@ def run():
     """execute the TraCI control loop"""
     step = 0
 
-    route = traci.simulation.findRoute("3314142#3","3314142#4").edges
+# TAXI 1 ######
+#   findRoute(self, fromEdge, toEdge, vType='', depart=-1.0, routingMode=0)
+    route = traci.simulation.findRoute("279297476","66478404#2").edges
     traci.route.add("taxi1Start", route)
     traci.vehicle.add('taxi1', "taxi1Start")
     traci.vehicle.setColor('taxi1', (255,0,0))
     # setStop(self, vehID, edgeID, pos=1.0, laneIndex=0...)
-    traci.vehicle.setStop("taxi1", "3314142#3", 5.0, flags=traci.constants.STOP_PARKING)
+    traci.vehicle.setStop("taxi1", "279297476", 5.0, flags=traci.constants.STOP_PARKING)
+
+# TAXI 2 ######
+#   findRoute(self, fromEdge, toEdge, vType='', depart=-1.0, routingMode=0)
+    route = traci.simulation.findRoute("-167299074#1","66478404#2").edges
+    traci.route.add("taxi2Start", route)
+    traci.vehicle.add('taxi2', "taxi2Start")
+    traci.vehicle.setColor('taxi2', (255,0,0))
+    # setStop(self, vehID, edgeID, pos=1.0, laneIndex=0...)
+    traci.vehicle.setStop("taxi2", "-167299074#1", 5.0, flags=traci.constants.STOP_PARKING)
+
+# TAXI 3 ######
+#   findRoute(self, fromEdge, toEdge, vType='', depart=-1.0, routingMode=0)
+    route = traci.simulation.findRoute("270055655","66478404#2").edges
+    traci.route.add("taxi3Start", route)
+    traci.vehicle.add('taxi3', "taxi3Start")
+    traci.vehicle.setColor('taxi3', (255,0,0))
+    # setStop(self, vehID, edgeID, pos=1.0, laneIndex=0...)
+    traci.vehicle.setStop("taxi3", "270055655", 5.0, flags=traci.constants.STOP_PARKING)
+    
+    cars = []
 
     while traci.simulation.getMinExpectedNumber() > 0:
 #    while step < 1000:
@@ -62,18 +84,17 @@ def run():
 #        print(vehs)
         pos = {}
 #        for v in vehs:
-        pos2D = traci.vehicle.getPosition("taxi1")
-        pos["taxi1"] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
-#        topic = "pos/sloveni/ljubljana/" + v
-        topic = "pos/sloveni/ljubljana/taxi1"
-        payload = json.dumps({"id":"taxi1", "lon":pos["taxi1"][0], "lat":pos["taxi1"][1]})
+        for name in ["taxi1"]:#, "taxi2", "taxi3"]:
+            pos2D = traci.vehicle.getPosition(name)
+            pos[name] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
+            topic = "pos/slovenia/ljubljana/" + name
+            payload = json.dumps({"id":name, "lon":pos[name][0], "lat":pos[name][1]})
 
-#        print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
-        print("------------")
-        print(payload)
-        if(step%1 == 0):
-            print("nottttttttttttttttttttttttt")
-            mqttClient.publish(topic, payload)
+#           print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
+            print("------------")
+            print(payload)
+            if(step%1 == 0):
+                mqttClient.publish(topic, payload)
 #            print(pos[v])
 #        print(vehs)
 #        if step == 40:
@@ -92,8 +113,10 @@ def run():
 #            traci.vehicle.setRouteID("right_0", "down")
             if traci.vehicle.getSpeed("taxi1") == 0:
                 traci.vehicle.resume("taxi1")
-            newRoute = traci.simulation.findRoute("3314142#3", "72267225").edges
+#            newRoute = traci.simulation.findRoute("279297476", "39726119#0").edges
+            newRoute = traci.simulation.findRoute("279297476", "66478404#2").edges
             traci.vehicle.setRoute("taxi1", newRoute)
+            traci.vehicle.setStop("taxi1", "66478404#2", flags=traci.constants.STOP_PARKING)
         step += 1
     mqttClient.disconnect()
     mqttClient.loop_stop()
@@ -170,6 +193,6 @@ if __name__ == "__main__":
     # this is the normal way of using traci. sumo is started as a
     # subprocess and then the python script connects and runs
     global traci
-    traci.start([sumoBinary, "-c", "data/cross.sumocfg"])
+    traci.start([sumoBinary, "-c", "data/cross.sumocfg", "--collision.check-junctions","true","--collision.action","teleport"])
 #    run()
     main()

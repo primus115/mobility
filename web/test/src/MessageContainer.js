@@ -14,7 +14,7 @@ export default class MessageContainer extends React.Component {
   render(){
     return (
       <div>
-        <MessageList data={this.props.data} />
+        <MessageList data={this.props.data} topic={this.props.topic}/>
         <MessageForm onSubmit={this.addMessage.bind(this)} />
       </div>
     )
