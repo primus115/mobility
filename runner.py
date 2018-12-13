@@ -49,7 +49,8 @@ def run():
 
 # TAXI 1 ######
 #   findRoute(self, fromEdge, toEdge, vType='', depart=-1.0, routingMode=0)
-    route = traci.simulation.findRoute("279297476","66478404#2").edges
+    route = traci.simulation.findRoute("279297476","279297476").edges
+    print("route:::: ", route)
     traci.route.add("taxi1Start", route)
     traci.vehicle.add('taxi1', "taxi1Start")
     traci.vehicle.setColor('taxi1', (255,0,0))
@@ -73,6 +74,8 @@ def run():
     traci.vehicle.setColor('taxi3', (255,0,0))
     # setStop(self, vehID, edgeID, pos=1.0, laneIndex=0...)
     traci.vehicle.setStop("taxi3", "270055655", 5.0, flags=traci.constants.STOP_PARKING)
+
+
     
     cars = []
 
@@ -87,7 +90,8 @@ def run():
         for name in ["taxi1"]:#, "taxi2", "taxi3"]:
             pos2D = traci.vehicle.getPosition(name)
             pos[name] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
-            topic = "pos/slovenia/ljubljana/" + name
+            #convertRoad(self, x, y, isGeo=False)
+            topic = "pos/slovenia/ljubljana"
             payload = json.dumps({"id":name, "lon":pos[name][0], "lat":pos[name][1]})
 
 #           print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
@@ -111,12 +115,21 @@ def run():
 #            traci.vehicle.setRoute("right_0", ["10", "03", "30"])
             # setRouteID(self, vehID, routeID)
 #            traci.vehicle.setRouteID("right_0", "down")
+#            newRoute = traci.simulation.findRoute("279297476", "39726119#0").edges
+#            edgeID = traci.simulation.convertRoad(14.49634, 46.04794, True)
+#            edgeID = traci.simulation.convertRoad(14.49278, 46.04561, True)
+            edgeID = traci.simulation.convertRoad(14.47917, 46.04494, True)
+#            newRoute = traci.simulation.findRoute("279297476", edgeID[0]).edges
+            currentEdge = traci.vehicle.getRoadID("taxi1")
+            print("ROAD:::", currentEdge)
+##            newRoute = traci.simulation.findRoute(currentEdge, "66478404#2").edges
+            newRoute = traci.simulation.findRoute(currentEdge, edgeID[0]).edges
+            print("nova rutaaaaa: ", newRoute)
+            traci.vehicle.setRoute("taxi1", newRoute)
+            traci.vehicle.setStop("taxi1", edgeID[0], flags=traci.constants.STOP_PARKING)
+###            traci.vehicle.setStop("taxi1", "66478404#2", flags=traci.constants.STOP_PARKING)
             if traci.vehicle.getSpeed("taxi1") == 0:
                 traci.vehicle.resume("taxi1")
-#            newRoute = traci.simulation.findRoute("279297476", "39726119#0").edges
-            newRoute = traci.simulation.findRoute("279297476", "66478404#2").edges
-            traci.vehicle.setRoute("taxi1", newRoute)
-            traci.vehicle.setStop("taxi1", "66478404#2", flags=traci.constants.STOP_PARKING)
         step += 1
     mqttClient.disconnect()
     mqttClient.loop_stop()
