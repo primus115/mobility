@@ -86,7 +86,7 @@ class MessageList extends Component {
   
   handleClick = () => {
 	  const { value, myPos } = this.state
-	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({ lat: value[0], lon: value[1], myLat: myPos.lat, myLon: myPos.lon }))
+	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:"0xABCD", lat: value[0], lon: value[1], myLat: myPos.lat, myLon: myPos.lon }))
   }
 
   handleChange = (e, { value }) => this.setState({ value })
