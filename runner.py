@@ -94,6 +94,34 @@ def run():
             topic = "pos/slovenia/ljubljana"
             payload = json.dumps({"id":name, "lon":pos[name][0], "lat":pos[name][1]})
 
+            edgeIDt1 = traci.simulation.convertRoad(14.48367, 46.04032, True)
+            print("::::::: ", edgeIDt1)
+            edgeIDt2 = traci.simulation.convertRoad(14.48507, 46.04064, True)
+            print("::::::: ", edgeIDt2)
+            edgeIDt3 = traci.simulation.convertRoad(14.49044, 46.04335, True)
+            print("::::::: ", edgeIDt3)
+#            traci.vehicle.getAdaptedTraveltime("taxi1", time, edgeID)
+            print("traveltime", traci.vehicle.getAdaptedTraveltime("taxi1", 0, edgeIDt1[0]))
+            print("traveltime", traci.vehicle.getAdaptedTraveltime("taxi1", 0, edgeIDt2[0]))
+            print("adaptedTraveltime after adaption in interval (check time 0)", traci.edge.getTraveltime(edgeIDt1[0]))
+            print("adaptedTraveltime after adaption in interval (check time 0)", traci.edge.getTraveltime(edgeIDt2[0]))
+            print("adaptedTraveltime after adaption in interval (check time 0)", traci.edge.getTraveltime(edgeIDt3[0]))
+
+            route1 = traci.simulation.findRoute("279297476",edgeIDt1[0]).edges
+            route2 = traci.simulation.findRoute("279297476",edgeIDt2[0]).edges
+            print("kkkkk: ",route)
+            time = 0
+            for edge in route1 :
+               time += traci.edge.getTraveltime(edge)
+            print("time111: ",time)
+            time = 0
+            for edge in route2 :
+               time += traci.edge.getTraveltime(edge)
+            print("time2222: ",time)
+
+
+
+
 #           print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
             print("------------")
             print(payload)
@@ -147,7 +175,7 @@ def get_options():
 def mqtt_on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
-    client.subscribe("data/#")
+    client.subscribe("req/slovenia/#")
     print("Subscribed")
 
 # The callback for when a PUBLISH message is received from the server.
@@ -156,8 +184,16 @@ def mqtt_on_message(client, userdata, msg):
     global message
     message = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     m_decode=str(msg.payload.decode("utf-8","ignore"))
-#    if msg.topic == "sigfox/survey":
+    if msg.topic == "req/slovenia/ljubljana":
 #    if msg.payload == "EXIT":
+        for name in ["taxi1"]:#, "taxi2", "taxi3"]:
+            pos2D = traci.vehicle.getPosition(name)
+            pos[name] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
+            #convertRoad(self, x, y, isGeo=False)
+            topic = "pos/slovenia/ljubljana"
+            payload = json.dumps({"id":name, "lon":pos[name][0], "lat":pos[name][1]})
+
+
     print("Topic: " + msg.topic)
     print("payload: " + msg.payload)
 #    if traci.vehicle.getSpeed("right_0") == 0:

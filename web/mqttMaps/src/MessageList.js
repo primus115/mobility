@@ -8,9 +8,9 @@ import { Button, Dropdown } from 'semantic-ui-react'
 
 
 const options = [
-  { key: 1, text: 'One', value: 1 },
+  { key: 1, text: 'Koseskega ulica 30', value: [ 46.03966, 14.49439 ] },
   { key: 2, text: 'Two', value: 2 },
-  { key: 3, text: 'Three', value: [46.04318, 14.49486] },
+  { key: 3, text: 'Three', value: 3 },
 ]
 
 class MessageList extends Component {
@@ -19,7 +19,7 @@ class MessageList extends Component {
   constructor(props) {
     super(props);
 	this.state = {
-		value: [],
+		value: [ 46.03966, 14.49439 ],
 		messageList: [],
 		pos: { lat: null, lon: null},
 		myPos: { lat: 46.04318, lon: 14.49486},
@@ -85,7 +85,8 @@ class MessageList extends Component {
   //		  </ul>
   
   handleClick = () => {
-	  this.client.publish("pos/slovenia/ljubljana", JSON.stringify({ lat: this.state.value[0], lon: this.state.value[1] }))
+	  const { value, myPos } = this.state
+	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({ lat: value[0], lon: value[1], myLat: myPos.lat, myLon: myPos.lon }))
   }
 
   handleChange = (e, { value }) => this.setState({ value })
@@ -109,7 +110,7 @@ class MessageList extends Component {
 					options={options}
 					placeholder='Choose an option'
 					selection
-					defaultValue={3}
+					defaultValue={1}
 					value={value}
 				/>
 				<Button size='small' primary content='Request a Trip!' onClick={this.handleClick}/>
