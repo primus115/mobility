@@ -83,7 +83,7 @@ def run():
     while traci.simulation.getMinExpectedNumber() > 0:
 #    while step < 1000:
         traci.simulationStep()
-        print(step)
+#        print(step)
         vehs = traci.vehicle.getIDList()
 #        print(vehs)
         pos = {}
@@ -125,9 +125,9 @@ def run():
 
 
 #           print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
-            print("------------")
-            print(payload)
-            if(step%1 == 0):
+#            print("------------")
+#            print(payload)
+            if(step%100 == 0):
                 mqttClient.publish(topic, payload)
 #            print(pos[v])
 #        print(vehs)
@@ -171,36 +171,45 @@ def run():
     traci.close()
     sys.stdout.flush()
 
+# states that comes from mqttOnMessage
 def stateAction(state):
     global dataJson
     if(state == "request"):
-        print("ok")
-        vehEdgeID = traci.vehicle.getRoadID("taxi1")
-        edgeIDt1 = traci.simulation.convertRoad(dataJson["myLon"], dataJson["myLat"], True)
-        print("::::::: ", edgeIDt1[0])
-#        route1 = traci.simulation.findRoute("279297476",edgeIDt1[0]).edges
-#        route2 = traci.simulation.findRoute("279297476",edgeIDt2[0]).edges
-#        print("kkkkk: ",route)
-#        time = 0
-#        for edge in route1 :
-#           time += traci.edge.getTraveltime(edge)
-#        print("time111: ",time)
+        appEdgeID = traci.simulation.convertRoad(dataJson["appLon"], dataJson["appLat"], True)
+        destEdgeID = traci.simulation.convertRoad(dataJson["destLon"], dataJson["destLat"], True)
+        route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
+        route2time = 0
+        for edge in route2 :
+           route2time += traci.edge.getTraveltime(edge)
 
-def get_options():
+        for car in ["taxi1", "taxi2", "taxi3"]:
+            print("For the vehicle :", car)
+            vehEdgeID = traci.vehicle.getRoadID(car)
+            route1 = traci.simulation.findRoute(vehEdgeID,appEdgeID[0]).edges
+            route1time = 0
+            for edge in route1 :
+                route1time += traci.edge.getTraveltime(edge)
+            duration = route1time + route2time
+            minutes = int(duration) / 60
+            seconds = duration % 60
+            print("minutes: ", minutes)
+            print("seconds: ", seconds)
+
+def getOptions():
     optParser = optparse.OptionParser()
     optParser.add_option("--nogui", action="store_true",
                          default=False, help="run the commandline version of sumo")
     options, args = optParser.parse_args()
     return options
 
-def mqtt_on_connect(client, userdata, flags, rc):
+def mqttOnConnect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
     client.subscribe("req/slovenia/#")
     print("Subscribed")
 
 # The callback for when a PUBLISH message is received from the server.
-def mqtt_on_message(client, userdata, msg):
+def mqttOnMessage(client, userdata, msg):
     global traci
     global state
     global dataJson
@@ -230,8 +239,8 @@ def mqtt_on_message(client, userdata, msg):
 def main():
     global mqttClient
     mqttClient = mqtt.Client("mobiClient")
-    mqttClient.on_connect = mqtt_on_connect
-    mqttClient.on_message = mqtt_on_message
+    mqttClient.on_connect = mqttOnConnect
+    mqttClient.on_message = mqttOnMessage
 
     mqttClient.connect("178.62.252.50", port=1883, keepalive=60)
 
@@ -252,7 +261,7 @@ def main():
 
 # this is the main entry point of this script
 if __name__ == "__main__":
-    options = get_options()
+    options = getOptions()
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run

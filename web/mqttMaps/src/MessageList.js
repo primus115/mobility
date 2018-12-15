@@ -22,7 +22,7 @@ class MessageList extends Component {
 		value: [ 46.03966, 14.49439 ],
 		messageList: [],
 		pos: { lat: null, lon: null},
-		myPos: { lat: 46.04318, lon: 14.49486},
+		appPos: { lat: 46.04318, lon: 14.49486},
 	}
   };
 
@@ -85,14 +85,14 @@ class MessageList extends Component {
   //		  </ul>
   
   handleClick = () => {
-	  const { value, myPos } = this.state
-	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:"0xABCD", lat: value[0], lon: value[1], myLat: myPos.lat, myLon: myPos.lon }))
+	  const { value, appPos } = this.state
+	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:"0xABCD", destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
   }
 
   handleChange = (e, { value }) => this.setState({ value })
  
   render() {
-	  const { value, pos, myPos } = this.state
+	  const { value, pos, appPos } = this.state
 
   	  return (
   		<div>
@@ -100,7 +100,7 @@ class MessageList extends Component {
  			<div>map</div>
   			<Map center={[46.0438, 14.4947]} zoom={14} width={1200} height={600}>
   				<Marker anchor={[pos.lat, pos.lon]} payload={1} />
-  			    <Overlay anchor={[myPos.lat, myPos.lon]} offset={[10, 5]}>
+  			    <Overlay anchor={[appPos.lat, appPos.lon]} offset={[10, 5]}>
   					<img src={man} width={60} height={40} alt='' />
   				</Overlay>
   			</Map>
