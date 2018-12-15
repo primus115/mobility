@@ -191,9 +191,13 @@ def stateAction(state):
                 route1time += traci.edge.getTraveltime(edge)
             duration = route1time + route2time
             minutes = int(duration) / 60
-            seconds = duration % 60
+            seconds = int(duration % 60)
             print("minutes: ", minutes)
             print("seconds: ", seconds)
+
+            topic = "res/" + dataJson["id"] + "/duration"
+            payload = json.dumps({"name":car, "duration": {"minutes":minutes, "seconds":seconds}})
+            mqttClient.publish(topic,payload)
 
 def getOptions():
     optParser = optparse.OptionParser()

@@ -6,6 +6,7 @@ import man from './img/baseline.png'
 import Mqtt from 'mqtt'
 import { Button, Dropdown } from 'semantic-ui-react'
 
+const id = "0Xasdf"
 
 const options = [
   { key: 1, text: 'Koseskega ulica 30', value: [ 46.03966, 14.49439 ] },
@@ -53,26 +54,34 @@ class MessageList extends Component {
         mqttError: true,
       })
       mqttClient.subscribe('pos/slovenia/ljubljana/#')
+      mqttClient.subscribe(`res/${id}/#`)
     })
 
     mqttClient.on('message', (topic, message) => {
-      let msgArray
+      let msg
       try {
-        msgArray = JSON.parse(message.toString())
-//		console.log(msgArray)
-		this.state.messageList.push(msgArray)
+        msg = JSON.parse(message.toString())
+//		console.log(msg)
+		this.state.messageList.push(msg)
       } catch (e) {
         console.error('Json parsing fails！')
         return
       }
 
 	  if (topic === 'pos/slovenia/ljubljana') {
-		const newPos = {...this.state.pos, lat: msgArray.lat, lon: msgArray.lon}
+		const newPos = {...this.state.pos, lat: msg.lat, lon: msg.lon}
 		this.setState({ pos: newPos})
 		console.log(this.state.pos)
 	  }
-//	  console.log(this.state.pos.lat);
-//	  console.log(this.state.pos.lon);
+	  if (topic === `res/${id}/duration`) {
+//		const newPos = {...this.state.pos, lat: msgArray.lat, lon: msgArray.lon}
+//		this.setState({ pos: newPos})
+//		console.log(this.state.pos)
+		console.log(msg)
+		console.log(msg.duration.minutes)
+		console.log(msg.duration.seconds)
+	  }
+
     })
 
     this.client = mqttClient
@@ -86,7 +95,7 @@ class MessageList extends Component {
   
   handleClick = () => {
 	  const { value, appPos } = this.state
-	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:"0xABCD", destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
+	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
   }
 
   handleChange = (e, { value }) => this.setState({ value })
@@ -112,6 +121,7 @@ class MessageList extends Component {
 					selection
 					defaultValue={1}
 					value={value}
+					multiple={true}
 				/>
 				<Button size='small' primary content='Request a Trip!' onClick={this.handleClick}/>
 				<pre>Current value: {value}</pre>
