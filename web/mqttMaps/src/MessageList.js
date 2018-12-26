@@ -4,15 +4,17 @@ import Marker from 'pigeon-marker/react'
 import Overlay from 'pigeon-overlay'
 import man from './img/baseline.png'
 import Mqtt from 'mqtt'
-import { Button, Dropdown } from 'semantic-ui-react'
+import { Button, Dropdown, List } from 'semantic-ui-react'
 
 const id = "0Xasdf"
 
 const options = [
-  { key: 1, text: 'Koseskega ulica 30', value: [ 46.03966, 14.49439 ] },
+  { key: 1, text: 'Koseskega ulica 30', value: 1 },
   { key: 2, text: 'Two', value: 2 },
-  { key: 3, text: 'Three', value: 3 },
+  { key: 3, text: 'Three', value: 3 }
 ]
+
+
 
 class MessageList extends Component {
 
@@ -23,7 +25,8 @@ class MessageList extends Component {
 		value: [ 46.03966, 14.49439 ],
 		messageList: [],
 		pos: { lat: null, lon: null},
-		appPos: { lat: 46.04318, lon: 14.49486},
+		appPos: { lat: 46.04494, lon: 14.47917},
+		rides: []
 	}
   };
 
@@ -62,7 +65,9 @@ class MessageList extends Component {
       try {
         msg = JSON.parse(message.toString())
 //		console.log(msg)
-		this.state.messageList.push(msg)
+//		this.state.messageList.push(msg)
+//		console.log("liiiiiiisssstaaaaa:::")
+//		console.log(this.state.messageList)
       } catch (e) {
         console.error('Json parsing fails！')
         return
@@ -71,12 +76,18 @@ class MessageList extends Component {
 	  if (topic === 'pos/slovenia/ljubljana') {
 		const newPos = {...this.state.pos, lat: msg.lat, lon: msg.lon}
 		this.setState({ pos: newPos})
-		console.log(this.state.pos)
+//		console.log(this.state.pos)
 	  }
 	  if (topic === `res/${id}/duration`) {
 //		const newPos = {...this.state.pos, lat: msgArray.lat, lon: msgArray.lon}
 //		this.setState({ pos: newPos})
 //		console.log(this.state.pos)
+//asdf		this.setState({ })
+//		this.state.rides.push(msg)
+		const newRides = [...this.state.rides, msg]
+		this.setState({ rides: newRides})
+		console.log("riddddeeesss:")
+		console.log(this.state.rides)
 		console.log(msg)
 		console.log(msg.duration.minutes)
 		console.log(msg.duration.seconds)
@@ -94,12 +105,41 @@ class MessageList extends Component {
   //		  </ul>
   
   handleClick = () => {
-	  const { value, appPos } = this.state
-	  this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
+	const { value, appPos } = this.state
+	this.setState({ rides: [] })
+	this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
   }
 
-  handleChange = (e, { value }) => this.setState({ value })
- 
+  handleChange = (e, { value }) => {
+	this.setState({ rides: [] })
+	if (value === 1) this.setState({ value: [ 46.03966, 14.49439 ] })
+	if (value === 2) this.setState({ value: [ 46.03966, 14.49439 ] })
+	if (value === 3) this.setState({ value: [ 46.03966, 14.49439 ] })
+  }
+
+  rideClick = (name) => {
+	const { value, appPos } = this.state
+	console.log("-------------")
+	console.log(name)
+	this.client.publish(`req/${name}`, JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
+  }
+
+  renderList = (rides) => {
+	return(
+		<div>
+			{rides.map((item, index) => (
+				<List selection verticalAlign='middle' key={index}>
+				  <List.Item onClick={() => this.rideClick(item.name)}>
+					<List.Content>
+					  <List.Header>{item.name}: {item.duration.minutes} minutes, {item.duration.seconds} seconds</List.Header>
+					</List.Content>
+				  </List.Item>
+				</List>
+			))}
+		</div>
+    )
+  }
+
   render() {
 	  const { value, pos, appPos } = this.state
 
@@ -120,11 +160,11 @@ class MessageList extends Component {
 					placeholder='Choose an option'
 					selection
 					defaultValue={1}
-					value={value}
-					multiple={true}
+					multiple={false}
 				/>
-				<Button size='small' primary content='Request a Trip!' onClick={this.handleClick}/>
-				<pre>Current value: {value}</pre>
+				<Button size='small' primary content='Request a Ride!' onClick={this.handleClick}/>
+				<h3>Pick a ride:</h3>
+				{this.renderList(this.state.rides)}
 			</div>
   		</div>
   	  )

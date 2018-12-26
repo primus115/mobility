@@ -8,11 +8,8 @@
 # SPDX-License-Identifier: EPL-2.0
 
 # @file    runner.py
-# @author  Lena Kalleske
-# @author  Daniel Krajzewicz
-# @author  Michael Behrisch
-# @author  Jakob Erdmann
-# @date    2009-03-26
+# @author  Primoz Zajec
+# @date    2018-11-
 # @version $Id$
 
 from __future__ import absolute_import
@@ -38,13 +35,15 @@ from sumolib import checkBinary  # noqa
 import traci  # noqa
 
 global state
-state = ""
+state = [""]
 global dataJson
 
 def run():
     global mqttClient
     global traci
     global state
+    global carName
+    carName = ""
     """execute the TraCI control loop"""
     step = 0
 
@@ -88,12 +87,13 @@ def run():
 #        print(vehs)
         pos = {}
 #        for v in vehs:
-        for name in ["taxi1"]:#, "taxi2", "taxi3"]:
-            pos2D = traci.vehicle.getPosition(name)
-            pos[name] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
+#        for name in ["taxi1"]:#, "taxi2", "taxi3"]:
+        if (carName != ""):
+            pos2D = traci.vehicle.getPosition(carName)
+            pos[carName] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
             #convertRoad(self, x, y, isGeo=False)
             topic = "pos/slovenia/ljubljana"
-            payload = json.dumps({"id":name, "lon":pos[name][0], "lat":pos[name][1]})
+            payload = json.dumps({"id":carName, "lon":pos[carName][0], "lat":pos[carName][1]})
             
 
 #            edgeIDt1 = traci.simulation.convertRoad(14.48367, 46.04032, True)
@@ -127,44 +127,48 @@ def run():
 #           print("convertGeo2D", traci.simulation.convertGeo(pos["taxi1"][0], pos["taxi1"][1], True))
 #            print("------------")
 #            print(payload)
-            if(step%100 == 0):
+            if(step%1 == 0):
                 mqttClient.publish(topic, payload)
 #            print(pos[v])
 #        print(vehs)
 #        if step == 40:
-        if state == "request":
+        if state[0] == "request":
             state_ = state
-            state = ""
+            state = [""]
+            stateAction(state_)
+        if state[0] == "requestSpecific":
+            state_ = state
+            state = [""]
             stateAction(state_)
 
-#            for veh in ["taxi1"]:#, "taxi2", "taxi3"]:
- 
-            print("----------------------------------")
-            print("We are in 40s")
-            print("----------------------------------")
-#            if traci.vehicle.getSpeed("right_0") == 0:
-#                traci.vehicle.resume("right_0")
-            # changeTarget(vehicleID, edgeID) - can make turns
-#            traci.vehicle.changeTarget("right_0", "04")
-            # setRoute(self, vehID, edgeList) ex:setRoute('1', ['1', '2', '4'])
-#            traci.vehicle.setRoute("right_0", ["10", "03", "30"])
-            # setRouteID(self, vehID, routeID)
-#            traci.vehicle.setRouteID("right_0", "down")
-#            newRoute = traci.simulation.findRoute("279297476", "39726119#0").edges
-#            edgeID = traci.simulation.convertRoad(14.49634, 46.04794, True)
-#            edgeID = traci.simulation.convertRoad(14.49278, 46.04561, True)
-            edgeID = traci.simulation.convertRoad(14.47917, 46.04494, True)
-#            newRoute = traci.simulation.findRoute("279297476", edgeID[0]).edges
-            currentEdge = traci.vehicle.getRoadID("taxi1")
-            print("ROAD:::", currentEdge)
-##            newRoute = traci.simulation.findRoute(currentEdge, "66478404#2").edges
-            newRoute = traci.simulation.findRoute(currentEdge, edgeID[0]).edges
-            print("nova rutaaaaa: ", newRoute)
-            traci.vehicle.setRoute("taxi1", newRoute)
-            traci.vehicle.setStop("taxi1", edgeID[0], flags=traci.constants.STOP_PARKING)
-###            traci.vehicle.setStop("taxi1", "66478404#2", flags=traci.constants.STOP_PARKING)
-            if traci.vehicle.getSpeed("taxi1") == 0:
-                traci.vehicle.resume("taxi1")
+##            for veh in ["taxi1"]:#, "taxi2", "taxi3"]:
+# 
+#            print("----------------------------------")
+#            print("We are in 40s")
+#            print("----------------------------------")
+##            if traci.vehicle.getSpeed("right_0") == 0:
+##                traci.vehicle.resume("right_0")
+#            # changeTarget(vehicleID, edgeID) - can make turns
+##            traci.vehicle.changeTarget("right_0", "04")
+#            # setRoute(self, vehID, edgeList) ex:setRoute('1', ['1', '2', '4'])
+##            traci.vehicle.setRoute("right_0", ["10", "03", "30"])
+#            # setRouteID(self, vehID, routeID)
+##            traci.vehicle.setRouteID("right_0", "down")
+##            newRoute = traci.simulation.findRoute("279297476", "39726119#0").edges
+##            edgeID = traci.simulation.convertRoad(14.49634, 46.04794, True)
+##            edgeID = traci.simulation.convertRoad(14.49278, 46.04561, True)
+#            edgeID = traci.simulation.convertRoad(14.47917, 46.04494, True)
+##            newRoute = traci.simulation.findRoute("279297476", edgeID[0]).edges
+#            currentEdge = traci.vehicle.getRoadID("taxi1")
+#            print("ROAD:::", currentEdge)
+###            newRoute = traci.simulation.findRoute(currentEdge, "66478404#2").edges
+#            newRoute = traci.simulation.findRoute(currentEdge, edgeID[0]).edges
+#            print("nova rutaaaaa: ", newRoute)
+#            traci.vehicle.setRoute("taxi1", newRoute)
+#            traci.vehicle.setStop("taxi1", edgeID[0], flags=traci.constants.STOP_PARKING)
+####            traci.vehicle.setStop("taxi1", "66478404#2", flags=traci.constants.STOP_PARKING)
+#            if traci.vehicle.getSpeed("taxi1") == 0:
+#                traci.vehicle.resume("taxi1")
         step += 1
     mqttClient.disconnect()
     mqttClient.loop_stop()
@@ -174,7 +178,8 @@ def run():
 # states that comes from mqttOnMessage
 def stateAction(state):
     global dataJson
-    if(state == "request"):
+    ######################   REQUEST FOR ALL (DURATION)   ###################
+    if(state[0] == "request"):
         appEdgeID = traci.simulation.convertRoad(dataJson["appLon"], dataJson["appLat"], True)
         destEdgeID = traci.simulation.convertRoad(dataJson["destLon"], dataJson["destLat"], True)
         route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
@@ -183,12 +188,18 @@ def stateAction(state):
            route2time += traci.edge.getTraveltime(edge)
 
         for car in ["taxi1", "taxi2", "taxi3"]:
-            print("For the vehicle :", car)
+            print("For the vehicle :{}".format(car))
             vehEdgeID = traci.vehicle.getRoadID(car)
+#            print("VehEdgeID :", vehEdgeID)
             route1 = traci.simulation.findRoute(vehEdgeID,appEdgeID[0]).edges
+#            print("Route1 :", route1)
             route1time = 0
             for edge in route1 :
-                route1time += traci.edge.getTraveltime(edge)
+                mtime = traci.edge.getTraveltime(edge)
+                if (mtime > 40.0):
+                    print("STRANGE EST. TIME FOR NODE: {}!!!!!!!!!!!!!!!!!!!!!!!!!!".format(edge))
+                    mtime = 0.0
+                route1time += mtime
             duration = route1time + route2time
             minutes = int(duration) / 60
             seconds = int(duration % 60)
@@ -198,6 +209,27 @@ def stateAction(state):
             topic = "res/" + dataJson["id"] + "/duration"
             payload = json.dumps({"name":car, "duration": {"minutes":minutes, "seconds":seconds}})
             mqttClient.publish(topic,payload)
+
+    ########################   SPECIFIC TRIP REQUEST   #################
+    if(state[0] == "requestSpecific"):
+        global carName
+        carName = state[1]
+        appEdgeID = traci.simulation.convertRoad(dataJson["appLon"], dataJson["appLat"], True)
+        print("appEdgeID :", appEdgeID)
+        destEdgeID = traci.simulation.convertRoad(dataJson["destLon"], dataJson["destLat"], True)
+        print("destEdgeID :", destEdgeID)
+        route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
+
+        print("For the vehicle :{}".format(state[1]))
+        vehEdgeID = traci.vehicle.getRoadID(state[1])
+        print("vehEdgeID :", vehEdgeID)
+        route1 = traci.simulation.findRoute(vehEdgeID,appEdgeID[0]).edges
+        print("route1 :", route1)
+
+        if traci.vehicle.getSpeed(state[1]) == 0:
+            traci.vehicle.setRoute(state[1], route1)
+            traci.vehicle.resume(state[1])
+
 
 def getOptions():
     optParser = optparse.OptionParser()
@@ -209,7 +241,8 @@ def getOptions():
 def mqttOnConnect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
-    client.subscribe("req/slovenia/#")
+#    client.subscribe("req/slovenia/#")
+    client.subscribe("req/#")
     print("Subscribed")
 
 # The callback for when a PUBLISH message is received from the server.
@@ -217,11 +250,13 @@ def mqttOnMessage(client, userdata, msg):
     global traci
     global state
     global dataJson
+    dataJson = json.loads(msg.payload)
     m_decode=str(msg.payload.decode("utf-8","ignore"))
     if msg.topic == "req/slovenia/ljubljana":
-        dataJson = json.loads(msg.payload)
-        state = "request"
-#        vehs = traci.vehicle.getIDList()
+        state = ["request"]
+    splitTopic = msg.topic.split("/")
+    if ( splitTopic[0] == "req" and splitTopic[1] in ["taxi1", "taxi2", "taxi3"]):
+        state = ["requestSpecific", splitTopic[1]]
 #        for v in vehs:
 #        for veh in ["taxi1"]:#, "taxi2", "taxi3"]:
 #            pos2D = traci.vehicle.getPosition("taxi1")
@@ -232,6 +267,8 @@ def mqttOnMessage(client, userdata, msg):
 #            topic = "pos/slovenia/ljubljana"
 #            payload = json.dumps({"id":veh, "lon":pos[veh][0], "lat":pos[veh][1]})
 
+    print("---------------------------------")
+    print("MQTT message:")
     print("Topic: " + msg.topic)
     print("payload: " + msg.payload)
 #    if traci.vehicle.getSpeed("right_0") == 0:
