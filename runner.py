@@ -226,6 +226,13 @@ def stateAction(state):
         route1 = traci.simulation.findRoute(vehEdgeID,appEdgeID[0]).edges
         print("route1 :", route1)
 
+        #getDistanceRoad(self, edgeID1, pos1, edgeID2, pos2, isDriving=False)
+        distance1 = traci.simulation.getDistanceRoad(vehEdgeID, 0, appEdgeID[0], 0, isDriving=True)
+        distance2 = traci.simulation.getDistanceRoad(appEdgeID[0], 0, destEdgeID[0], 0, isDriving=True)
+        print("-AAA--a-a-a--a-a-a--a")
+        print(distance1)
+        print(distance2)
+
         if traci.vehicle.getSpeed(state[1]) == 0:
             traci.vehicle.setRoute(state[1], route1)
             traci.vehicle.setStop(state[1], appEdgeID[0], flags=traci.constants.STOP_PARKING)
