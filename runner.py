@@ -228,6 +228,7 @@ def stateAction(state):
 
         if traci.vehicle.getSpeed(state[1]) == 0:
             traci.vehicle.setRoute(state[1], route1)
+            traci.vehicle.setStop(state[1], appEdgeID[0], flags=traci.constants.STOP_PARKING)
             traci.vehicle.resume(state[1])
 
 

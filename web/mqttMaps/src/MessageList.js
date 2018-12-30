@@ -26,7 +26,8 @@ class MessageList extends Component {
 		messageList: [],
 		pos: { lat: null, lon: null},
 		appPos: { lat: 46.04494, lon: 14.47917},
-		rides: []
+		rides: [],
+		listVisible: 0
 	}
   };
 
@@ -104,7 +105,8 @@ class MessageList extends Component {
  // 			{this.props.data.value}
   //		  </ul>
   
-  handleClick = () => {
+  generalRequestClick = () => {
+	this.setState({ listVisible: 1 })
 	const { value, appPos } = this.state
 	this.setState({ rides: [] })
 	this.client.publish("req/slovenia/ljubljana", JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
@@ -122,22 +124,26 @@ class MessageList extends Component {
 	console.log("-------------")
 	console.log(name)
 	this.client.publish(`req/${name}`, JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
+	this.setState({ listVisible: 0 })
   }
 
   renderList = (rides) => {
-	return(
-		<div>
-			{rides.map((item, index) => (
-				<List selection verticalAlign='middle' key={index}>
-				  <List.Item onClick={() => this.rideClick(item.name)}>
-					<List.Content>
-					  <List.Header>{item.name}: {item.duration.minutes} minutes, {item.duration.seconds} seconds</List.Header>
-					</List.Content>
-				  </List.Item>
-				</List>
-			))}
-		</div>
-    )
+	if(this.state.listVisible){
+		return(
+			<div>
+				<h3>Pick a ride:</h3>
+				{rides.map((item, index) => (
+					<List selection verticalAlign='middle' key={index}>
+					  <List.Item onClick={() => this.rideClick(item.name)}>
+						<List.Content>
+						  <List.Header>{item.name}: {item.duration.minutes} minutes, {item.duration.seconds} seconds</List.Header>
+						</List.Content>
+					  </List.Item>
+					</List>
+				))}
+			</div>
+		)
+	}
   }
 
   render() {
@@ -162,8 +168,7 @@ class MessageList extends Component {
 					defaultValue={1}
 					multiple={false}
 				/>
-				<Button size='small' primary content='Request a Ride!' onClick={this.handleClick}/>
-				<h3>Pick a ride:</h3>
+				<Button size='small' primary content='Request a Ride!' onClick={this.generalRequestClick}/>
 				{this.renderList(this.state.rides)}
 			</div>
   		</div>
