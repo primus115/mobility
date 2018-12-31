@@ -201,7 +201,7 @@ def stateAction(state):
                     mtime = 0.0
                 route1time += mtime
             duration = route1time + route2time
-            minutes = int(duration) / 60
+            minutes = int(duration / 60)
             seconds = int(duration % 60)
             print("minutes: ", minutes)
             print("seconds: ", seconds)
@@ -258,11 +258,15 @@ def mqttOnMessage(client, userdata, msg):
     global traci
     global state
     global dataJson
-    dataJson = json.loads(msg.payload)
+    try:
+        dataJson = json.loads(msg.payload.decode("utf-8"))
+    except Exception as e:
+        print(e)
     m_decode=str(msg.payload.decode("utf-8","ignore"))
     if msg.topic == "req/slovenia/ljubljana":
         state = ["request"]
     splitTopic = msg.topic.split("/")
+    print(splitTopic)
     if ( splitTopic[0] == "req" and splitTopic[1] in ["taxi1", "taxi2", "taxi3"]):
         state = ["requestSpecific", splitTopic[1]]
 #        for v in vehs:
