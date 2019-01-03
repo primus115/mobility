@@ -206,9 +206,8 @@ def stateAction(state):
         except Exception as e:
             print(e)
         ################################################################
-        print("nakazi:")
-        print(distance * 0.00001)
-
+        rideID = random.randint(1, 999999999999)
+        print("Pay ride id:{}, with amount: {:.5f} ether".format(rideID, distance * 0.00001))
 
         if traci.vehicle.getSpeed(carName) == 0:
             traci.vehicle.setRoute(carName, route1)
@@ -220,14 +219,16 @@ def getVehicleADDR(_carName):
         return '0xB76AC1f39edCa9087dBcaa832B3169cCE0E8Dc65'
     elif _carName == "taxi2":
         return '0xEFB3164881f0B9E3b8b498951A9047fD24dACE4c'
+    elif _carName == "taxi3":
+        return '0x28185AF737F17459CE7176905351a09b53943104'
 
 def getProfileADDR(_carName):
     if _carName == "taxi1":
-        return '0xf9a4eb92B62eDd28ccB9165eC5271029422E5D4C'
+        return '0x37D2bF2Fe9f225336784337Ed581A2FDd7bd4952'
     elif _carName == "taxi2":
-        return '0x6811fd581988561A2b2292f401400e3e05614987'
-
-
+        return '0xf1080ce12d54d5d8076D3FA5A8aA48FaA2Ef0e17'
+    elif _carName == "taxi3":
+        return '0x06D2e345DBd7899254CF2d6082B415FE2E0ceE68'
 
 def getOptions():
     optParser = optparse.OptionParser()
