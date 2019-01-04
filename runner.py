@@ -88,6 +88,7 @@ def run():
     while traci.simulation.getMinExpectedNumber() > 0:
 #    while step < 1000:
         traci.simulationStep()
+#        print("State0: {}".format(state[0]))
 #        print(step)
         vehs = traci.vehicle.getIDList()
 #        print(vehs)
@@ -209,6 +210,16 @@ def stateAction(state):
         rideID = random.randint(1, 999999999999)
         print("Pay ride id:{}, with amount: {:.5f} ether".format(rideID, distance * 0.00001))
 
+        # Stay in while loop and check on interval if generated ride is paied
+        # TODO: move this funcionality into separate thread and use events!!
+        isPaid = profile.functions.getIsPaid(rideID).call()
+        intervalCount = 0
+        while ( not isPaid ):
+            isPaid = profile.functions.getIsPaid(rideID).call()
+            time.sleep(5)
+        print("Thank you for your payment!")
+        print("Taxi is on his way!")
+
         if traci.vehicle.getSpeed(carName) == 0:
             traci.vehicle.setRoute(carName, route1)
             traci.vehicle.setStop(carName, appEdgeID[0], flags=traci.constants.STOP_PARKING)
@@ -260,20 +271,11 @@ def mqttOnMessage(client, userdata, msg):
     print(splitTopic)
     if ( splitTopic[0] == "req" and splitTopic[1] in ["taxi1", "taxi2", "taxi3"]):
         state = ["requestSpecific", splitTopic[1]]
-#        for v in vehs:
-#        for veh in ["taxi1"]:#, "taxi2", "taxi3"]:
-#            pos2D = traci.vehicle.getPosition("taxi1")
-#            print("POSSSS:",pos2D)
-#            print("bbbbbbbbbbbbbbbb")
-#            vehEdgeID = traci.vehicle.getRoadID("taxi1")
-#            print("VEssssssss:",vehEdgeID)
-#            topic = "pos/slovenia/ljubljana"
-#            payload = json.dumps({"id":veh, "lon":pos[veh][0], "lat":pos[veh][1]})
 
-    print("---------------------------------")
-    print("MQTT message:")
+#    print("---------------------------------")
+#    print("MQTT message:")
     print("Topic: " + msg.topic)
-    print("payload: " + msg.payload)
+#    print("payload: " + msg.payload)
 #    if traci.vehicle.getSpeed("right_0") == 0:
 #        traci.vehicle.resume("right_0")
 #    traci.vehicle.setRoute("right_0", ["10", "03", "30"])

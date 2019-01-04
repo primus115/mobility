@@ -65,7 +65,7 @@ class MessageList extends Component {
       let msg
       try {
         msg = JSON.parse(message.toString())
-//		console.log(msg)
+		console.log("MQTT:" + msg)
 //		this.state.messageList.push(msg)
 //		console.log("liiiiiiisssstaaaaa:::")
 //		console.log(this.state.messageList)
@@ -122,7 +122,7 @@ class MessageList extends Component {
   rideClick = (name) => {
 	const { value, appPos } = this.state
 	console.log("-------------")
-	console.log(name)
+	console.log("Ride click: " + name)
 	this.client.publish(`req/${name}`, JSON.stringify({id:id, destLat: value[0], destLon: value[1], appLat: appPos.lat, appLon: appPos.lon }))
 	this.setState({ listVisible: 0 })
   }
