@@ -16,7 +16,7 @@ const options = [
 
 
 
-class MessageList extends Component {
+class MqttMap extends Component {
 
 
   constructor(props) {
@@ -177,4 +177,4 @@ class MessageList extends Component {
 }
 
 
-export default MessageList;
+export default MqttMap;
