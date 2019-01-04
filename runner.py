@@ -218,7 +218,7 @@ def stateAction(state):
             isPaid = profile.functions.getIsPaid(rideID).call()
             time.sleep(5)
         print("Thank you for your payment!")
-        print("Taxi is on his way!")
+        print("Taxi is on the way!")
 
         if traci.vehicle.getSpeed(carName) == 0:
             traci.vehicle.setRoute(carName, route1)
