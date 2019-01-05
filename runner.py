@@ -29,6 +29,8 @@ from web3 import Web3, HTTPProvider
 from getpass import getpass  
 
 RINKEBY = "https://rinkeby.infura.io/v3/23d1d5956dc54a068ab6887ef8e711b3"
+#ETHER_PER_METER = 0.00001
+METER_PER_ETHER = 100000
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -182,7 +184,7 @@ def stateAction(state):
         distance = int(distance1 + distance2)
 
         ###############   ETHEREUM CONTRACT - SET DISTANCE   ###########
-        with open("./ethereum/build/MobilityAccountABI.json") as f:
+        with open("./web/mqttMaps/src/ethereum/build/MobilityAccountABI.json") as f:
             info_json = json.load(f)
         abi = info_json
 
@@ -190,7 +192,7 @@ def stateAction(state):
         profile = w3.eth.contract(address=getProfileADDR(carName), abi=abi)
         pw = getpass(prompt='Enter the password for decryption: ')
 
-        with open('./ethereum/{}.json'.format(carName)) as keyfile:
+        with open('./web/mqttMaps/src/ethereum/{}.json'.format(carName)) as keyfile:
             encrypted_key = keyfile.read()
         pk = w3.eth.account.decrypt(encrypted_key, pw)
 
@@ -208,7 +210,11 @@ def stateAction(state):
             print(e)
         ################################################################
         rideID = random.randint(1, 999999999999)
-        print("Pay ride id:{}, with amount: {:.5f} ether".format(rideID, distance * 0.00001))
+        print("Pay ride id:{}, with amount: {:.5f} ether to contract: {}".format(rideID, distance / METER_PER_ETHER, getProfileADDR(carName)))
+
+        topic = "req_veh/" + dataJson["id"] + "/pay"
+        payload = json.dumps({"rideID":rideID, "amount":"{}".format(distance/METER_PER_ETHER), "address":getProfileADDR(carName) })
+        mqttClient.publish(topic,payload)
 
         # Stay in while loop and check on interval if generated ride is paied
         # TODO: move this funcionality into separate thread and use events!!

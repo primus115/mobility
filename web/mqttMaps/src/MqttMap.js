@@ -4,7 +4,7 @@ import Marker from 'pigeon-marker/react'
 import Overlay from 'pigeon-overlay'
 import man from './img/baseline.png'
 import Mqtt from 'mqtt'
-import { Button, Dropdown, List } from 'semantic-ui-react'
+import { Button, Dropdown, List, Message } from 'semantic-ui-react'
 import web3 from './ethereum/web3';
 import Account from './ethereum/account';
 
@@ -29,16 +29,18 @@ class MqttMap extends Component {
 		pos: { lat: null, lon: null},
 		appPos: { lat: 46.04494, lon: 14.47917},
 		rides: [],
+		errorMessage: '',
 		listVisible: 0
 	}
   };
 
   async componentDidMount() {
     this.mqttInit()
+	const accounts = await web3.eth.getAccounts();
 //	const profile = await Account(address);
-	const profile = await Account('0xf1080ce12d54d5d8076D3FA5A8aA48FaA2Ef0e17');
-	const distance = await profile.methods.getDistance().call();
-	console.log(distance)
+//	const profile = await Account('0xf1080ce12d54d5d8076D3FA5A8aA48FaA2Ef0e17');
+//	const distance = await profile.methods.getDistance().call();
+	console.log(accounts)
 }
 
   componentWillUnmount() {
@@ -65,6 +67,7 @@ class MqttMap extends Component {
       })
       mqttClient.subscribe('pos/slovenia/ljubljana/#')
       mqttClient.subscribe(`res/${id}/#`)
+      mqttClient.subscribe(`req_veh/${id}/#`)
     })
 
     mqttClient.on('message', (topic, message) => {
@@ -74,12 +77,13 @@ class MqttMap extends Component {
 		//console.log("MQTT:" + msg)
 //		this.state.messageList.push(msg)
 //		console.log("liiiiiiisssstaaaaa:::")
-/		console.log(this.state.messageList)
+//		console.log(this.state.messageList)
       } catch (e) {
         console.error('Json parsing fails！')
         return
       }
 
+//	  console.log(msg)
 	  if (topic === 'pos/slovenia/ljubljana') {
 		const newPos = {...this.state.pos, lat: msg.lat, lon: msg.lon}
 		this.setState({ pos: newPos})
@@ -93,24 +97,40 @@ class MqttMap extends Component {
 //		this.state.rides.push(msg)
 		const newRides = [...this.state.rides, msg]
 		this.setState({ rides: newRides})
-		console.log("riddddeeesss:")
+		console.log("Available rides:")
 		console.log(this.state.rides)
 		console.log(msg)
 		console.log(msg.duration.minutes)
 		console.log(msg.duration.seconds)
 	  }
-
+	  if (topic === `req_veh/${id}/pay`) {
+		this.pay(msg.rideID, msg.amount, msg.address)
+	  }
     })
-
     this.client = mqttClient
 }
 
-//  				<Marker anchor={[lat, lon]} payload={1} />
-//  				<Marker anchor={[this.state.pos.lat, this.state.pos.lon]} payload={1} />
-//  		  <ul>
- // 			{this.props.data.value}
-  //		  </ul>
-  
+  pay = async (rideID, amount, address) => {
+//	console.log(rideID)
+//	console.log(amount)
+//	console.log(address)
+	console.log("-----------------")
+	//bring in the smart contract from the chosen vehicle
+	const profile = await Account(address);
+	console.log(profile)
+	//bring in user's metamask account address
+	const accounts = await web3.eth.getAccounts();
+	console.log(accounts)
+	if (accounts.length == 0){
+		this.setState({ errorMessage: 'You must log in to your MetaMask accoutn' })
+		this.setState({ loading: false });
+		return;
+	}
+	console.log('Sending from Metamask account: ' + accounts[0]);
+	await profile.methods.payRide(rideID).send({ from: accounts[0],
+		value: web3.utils.toWei(amount, 'ether')}); // metamask automatically calculates amount of wei 
+  }
+
   generalRequestClick = () => {
 	this.setState({ listVisible: 1 })
 	const { value, appPos } = this.state
@@ -153,7 +173,7 @@ class MqttMap extends Component {
   }
 
   render() {
-	  const { value, pos, appPos } = this.state
+	  const { pos, appPos } = this.state
 
   	  return (
   		<div>
@@ -174,8 +194,9 @@ class MqttMap extends Component {
 					defaultValue={1}
 					multiple={false}
 				/>
-				<Button size='small' primary content='Request a Ride!' onClick={this.generalRequestClick}/>
+				<Button size='small' primary content='Request a Ride!' onClick={this.generalRequestClick} />
 				{this.renderList(this.state.rides)}
+				<Message error header="Oops!" content={this.state.errorMessage} />
 			</div>
   		</div>
   	  )
