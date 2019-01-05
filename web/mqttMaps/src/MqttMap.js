@@ -5,6 +5,8 @@ import Overlay from 'pigeon-overlay'
 import man from './img/baseline.png'
 import Mqtt from 'mqtt'
 import { Button, Dropdown, List } from 'semantic-ui-react'
+import web3 from './ethereum/web3';
+import Account from './ethereum/account';
 
 const id = "0Xasdf"
 
@@ -31,8 +33,12 @@ class MqttMap extends Component {
 	}
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.mqttInit()
+//	const profile = await Account(address);
+	const profile = await Account('0xf1080ce12d54d5d8076D3FA5A8aA48FaA2Ef0e17');
+	const distance = await profile.methods.getDistance().call();
+	console.log(distance)
 }
 
   componentWillUnmount() {
@@ -65,10 +71,10 @@ class MqttMap extends Component {
       let msg
       try {
         msg = JSON.parse(message.toString())
-		console.log("MQTT:" + msg)
+		//console.log("MQTT:" + msg)
 //		this.state.messageList.push(msg)
 //		console.log("liiiiiiisssstaaaaa:::")
-//		console.log(this.state.messageList)
+/		console.log(this.state.messageList)
       } catch (e) {
         console.error('Json parsing fails！')
         return
