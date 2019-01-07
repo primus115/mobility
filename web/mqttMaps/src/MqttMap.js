@@ -24,10 +24,10 @@ class MqttMap extends Component {
   constructor(props) {
     super(props);
 	this.state = {
-		value: [ 46.03966, 14.49439 ],
+		value: [ 46.04369, 14.47315 ],
 		messageList: [],
 		pos: { lat: null, lon: null},
-		appPos: { lat: 46.04494, lon: 14.47917},
+		appPos: { lat: 46.04604, lon: 14.47431 },
 		rides: [],
 		errorMessage: '',
 		listVisible: 0
@@ -87,6 +87,12 @@ class MqttMap extends Component {
 	  if (topic === 'pos/slovenia/ljubljana') {
 		const newPos = {...this.state.pos, lat: msg.lat, lon: msg.lon}
 		this.setState({ pos: newPos})
+		console.log("ISSAPPINCAR: ")
+		console.log(msg.isAppInCar)
+		if(parseInt(msg.isAppInCar)){
+			console.log("Trueeee")
+			this.setState({ appPos: newPos})
+		}
 //		console.log(this.state.pos)
 	  }
 	  if (topic === `res/${id}/duration`) {
@@ -140,9 +146,9 @@ class MqttMap extends Component {
 
   handleChange = (e, { value }) => {
 	this.setState({ rides: [] })
-	if (value === 1) this.setState({ value: [ 46.03966, 14.49439 ] })
-	if (value === 2) this.setState({ value: [ 46.03966, 14.49439 ] })
-	if (value === 3) this.setState({ value: [ 46.03966, 14.49439 ] })
+	if (value === 1) this.setState({ value: [ 46.04369, 14.47315 ] })
+	if (value === 2) this.setState({ value: [ 46.04369, 14.47315 ] })
+	if (value === 3) this.setState({ value: [ 46.04369, 14.47315 ] })
   }
 
   rideClick = (name) => {
