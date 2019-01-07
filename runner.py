@@ -58,7 +58,6 @@ def run():
 # TAXI 1 ######
 #   findRoute(self, fromEdge, toEdge, vType='', depart=-1.0, routingMode=0)
     route = traci.simulation.findRoute("279297476","279297476").edges
-    print("route:::: ", route)
     traci.route.add("taxi1Start", route)
     traci.vehicle.add('taxi1', "taxi1Start")
     traci.vehicle.setColor('taxi1', (255,0,0))
@@ -97,16 +96,15 @@ def run():
 #        for name in ["taxi1"]:#, "taxi2", "taxi3"]:
         if (carName != ""):
             vehEdgeID_new = traci.vehicle.getRoadID(carName)
-            print("razlika: {}".format(step - step_))
             if( vehEdgeID_new == appEdgeID[0] and ((step - step_) > 400) ):
-                print("EEEEENNNNAAAAKKKAAAA")
+                print("Waiting for the customer")
                 print(stopCount)
                 print(traci.vehicle.getSpeed(carName))
                 if (int(traci.vehicle.getSpeed(carName)) == 0 and (stopCount > 150) ):
                     step_ = step
                     vehEdgeID = traci.vehicle.getRoadID(carName)
                     route2 = traci.simulation.findRoute(vehEdgeID,destEdgeID[0]).edges
-                    print("E22222222222222")
+                    print("Towards the final stop")
                     traci.vehicle.setRoute(carName, route2)
                     print(route2)
                     print(destEdgeID[0])
@@ -115,12 +113,8 @@ def run():
                     traci.vehicle.resume(carName)
                     traci.vehicle.setStop(carName, destEdgeID[0], flags=traci.constants.STOP_PARKING)
                 stopCount+=1
-            print("appedge: {}".format(appEdgeID[0]))
-            print("vehedge: {}".format(vehEdgeID_new))
             pos2D = traci.vehicle.getPosition(carName)
-            print("NEW2D: {}".format(pos2D))
             pos[carName] = traci.simulation.convertGeo(pos2D[0], pos2D[1])
-            print("NEWpos: {}".format(pos[carName]))
             #convertRoad(self, x, y, isGeo=False)
             topic = "pos/slovenia/ljubljana"
             payload = json.dumps({"id":carName, "lon":pos[carName][0], "lat":pos[carName][1], "isAppInCar":isAppInCar})

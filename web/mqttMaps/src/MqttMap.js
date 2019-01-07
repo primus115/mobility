@@ -4,7 +4,7 @@ import Marker from 'pigeon-marker/react'
 import Overlay from 'pigeon-overlay'
 import man from './img/baseline.png'
 import Mqtt from 'mqtt'
-import { Button, Dropdown, List, Message } from 'semantic-ui-react'
+import { Button, Dropdown, List, Message, Form } from 'semantic-ui-react'
 import web3 from './ethereum/web3';
 import Account from './ethereum/account';
 
@@ -27,7 +27,7 @@ class MqttMap extends Component {
 		value: [ 46.04369, 14.47315 ],
 		messageList: [],
 		pos: { lat: null, lon: null},
-		appPos: { lat: 46.04604, lon: 14.47431 },
+		appPos: { lat: 46.04684, lon: 14.47441 },
 		rides: [],
 		errorMessage: '',
 		listVisible: 0
@@ -87,10 +87,7 @@ class MqttMap extends Component {
 	  if (topic === 'pos/slovenia/ljubljana') {
 		const newPos = {...this.state.pos, lat: msg.lat, lon: msg.lon}
 		this.setState({ pos: newPos})
-		console.log("ISSAPPINCAR: ")
-		console.log(msg.isAppInCar)
 		if(parseInt(msg.isAppInCar)){
-			console.log("Trueeee")
 			this.setState({ appPos: newPos})
 		}
 //		console.log(this.state.pos)
@@ -120,21 +117,25 @@ class MqttMap extends Component {
 //	console.log(rideID)
 //	console.log(amount)
 //	console.log(address)
-	console.log("-----------------")
-	//bring in the smart contract from the chosen vehicle
-	const profile = await Account(address);
-	console.log(profile)
-	//bring in user's metamask account address
-	const accounts = await web3.eth.getAccounts();
-	console.log(accounts)
-	if (accounts.length == 0){
-		this.setState({ errorMessage: 'You must log in to your MetaMask accoutn' })
-		this.setState({ loading: false });
-		return;
+	
+	this.setState({ loading: true, errorMessage: '' });
+	try {
+		//bring in the smart contract from the chosen vehicle
+		const profile = await Account(address);
+		//bring in user's metamask account address
+		const accounts = await web3.eth.getAccounts();
+		if (accounts.length == 0){
+			this.setState({ errorMessage: 'You must log in to your MetaMask accoutn' })
+			this.setState({ loading: false });
+			return;
+		}
+		console.log('Sending from Metamask account: ' + accounts[0]);
+		await profile.methods.payRide(rideID).send({ from: accounts[0],
+			value: web3.utils.toWei(amount, 'ether')}); // metamask automatically calculates amount of wei 
+	} catch (err) {
+		this.setState({ errorMessage: err.message.toString().split('\n')[0] });
 	}
-	console.log('Sending from Metamask account: ' + accounts[0]);
-	await profile.methods.payRide(rideID).send({ from: accounts[0],
-		value: web3.utils.toWei(amount, 'ether')}); // metamask automatically calculates amount of wei 
+	this.setState({ loading: false });
   }
 
   generalRequestClick = () => {
@@ -147,8 +148,8 @@ class MqttMap extends Component {
   handleChange = (e, { value }) => {
 	this.setState({ rides: [] })
 	if (value === 1) this.setState({ value: [ 46.04369, 14.47315 ] })
-	if (value === 2) this.setState({ value: [ 46.04369, 14.47315 ] })
-	if (value === 3) this.setState({ value: [ 46.04369, 14.47315 ] })
+	if (value === 2) this.setState({ value: [ 46.03699, 14.47337 ] })
+	if (value === 3) this.setState({ value: [ 46.03974, 14.48951 ] })
   }
 
   rideClick = (name) => {
@@ -187,11 +188,12 @@ class MqttMap extends Component {
  			<div>map</div>
   			<Map center={[46.0438, 14.4947]} zoom={14} width={1200} height={600}>
   				<Marker anchor={[pos.lat, pos.lon]} payload={1} />
-  			    <Overlay anchor={[appPos.lat, appPos.lon]} offset={[10, 5]}>
+  			    <Overlay anchor={[appPos.lat, appPos.lon]} offset={[30, 5]}>
   					<img src={man} width={60} height={40} alt='' />
   				</Overlay>
   			</Map>
  			<div>
+				<Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}> {/* if no string assigned value =0, so error is not displayed - !!double bool compare returns bool from string*/}
 				<Dropdown
 					onChange={this.handleChange}
 					options={options}
@@ -203,6 +205,7 @@ class MqttMap extends Component {
 				<Button size='small' primary content='Request a Ride!' onClick={this.generalRequestClick} />
 				{this.renderList(this.state.rides)}
 				<Message error header="Oops!" content={this.state.errorMessage} />
+				</Form>
 			</div>
   		</div>
   	  )
