@@ -143,6 +143,9 @@ def stateAction(state):
     ######################   REQUEST FOR ALL (DURATION)   ###################
     if(state[0] == "request"):
         global appEdgeID
+        global destEdgeID
+        global carName
+        global route2
         appEdgeID = traci.simulation.convertRoad(dataJson["appLon"], dataJson["appLat"], True)
         destEdgeID = traci.simulation.convertRoad(dataJson["destLon"], dataJson["destLat"], True)
         route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
@@ -176,14 +179,11 @@ def stateAction(state):
 
     ########################   SPECIFIC TRIP REQUEST   #################
     if(state[0] == "requestSpecific"):
-        global carName
         carName = state[1]
         appEdgeID = traci.simulation.convertRoad(dataJson["appLon"], dataJson["appLat"], True)
         print("appEdgeID :", appEdgeID)
-        global destEdgeID
         destEdgeID = traci.simulation.convertRoad(dataJson["destLon"], dataJson["destLat"], True)
         print("destEdgeID :", destEdgeID)
-        global route2
         route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
 
         print("For the vehicle :{}".format(carName))
