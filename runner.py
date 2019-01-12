@@ -310,6 +310,7 @@ def main():
     mqttClient = mqtt.Client("mobiClient")
     mqttClient.on_connect = mqttOnConnect
     mqttClient.on_message = mqttOnMessage
+    client.username_pw_set("mobi", mqttPasswd);
 
     mqttClient.connect("178.62.252.50", port=1883, keepalive=60)
 
@@ -331,6 +332,9 @@ def main():
 # this is the main entry point of this script
 if __name__ == "__main__":
     options = getOptions()
+
+    # get password for the mqtt user
+    mqttPasswd = getpass(prompt='Enter the password for mqtt mobi user: ')
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
