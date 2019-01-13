@@ -58,7 +58,7 @@ class MqttMap extends Component {
     mqttClient = Mqtt.connect(`ws:178.62.252.50:9001`, {
 	  rejectUnauthorized: false,
 	  username: 'mobi',
-  	  password: 'password_for_the_user_mobi',
+  	  password: 'mobi_user_mqtt_password',
     })
 
     mqttClient.on('connect', () => {
@@ -124,7 +124,7 @@ class MqttMap extends Component {
 		const profile = await Account(address);
 		//bring in user's metamask account address
 		const accounts = await web3.eth.getAccounts();
-		if (accounts.length == 0){
+		if (accounts.length === 0){
 			this.setState({ errorMessage: 'You must log in to your MetaMask accoutn' })
 			this.setState({ loading: false });
 			return;
