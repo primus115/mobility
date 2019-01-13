@@ -4,6 +4,10 @@
 Inspired from and for the [Mobi Grand Challenge](https://mobihacks.devpost.com/).  
 Goal is to make a mobility platform what will represent the point where different tehnologies can intersect. It can be used for testing, simulation and production.  
 
+### Arhitecture
+![](./picturesi/Mobility_Architecture.png)
+
+
 ### Vision
 Ethereum smart contract where are all the rules and users stored and ready for interaction.  
 DApp (Decentralized application), that can be used in two modes:  
@@ -15,8 +19,16 @@ DApp (Decentralized application), that can be used in two modes:
 
 
 1. Requesting a ride  
-Enter destination and from available offers pick the one that is fastest or cheapest. Watch where 
+source code: destination link  
+info:  
+Enter destination and from available offers pick the one that is fastest or cheapest. Watch where  
 2. Offer a ride   
+2.1 source code: destination link  
+info:  
+2.2 source code: destination link  
+info:  
+2.3 source code: destination link  
+info:  
 nekaj o samovozečih avtomobilih in mehkemu prehodu z uporabo dapp-a, ki bo 
 testiranje avtomatizirianih križišč ()
 
