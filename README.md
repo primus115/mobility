@@ -5,7 +5,7 @@ Inspired from and for the [Mobi Grand Challenge](https://mobihacks.devpost.com/)
 Goal is to make a mobility platform what will represent the point where different tehnologies can intersect. It can be used for testing, simulation and production.  
 
 ### Arhitecture
-![](./picturesi/Mobility_Architecture.png)
+![](./pictures/Mobility_Architecture.png "Mobility Architecture")
 
 
 ### Vision
