@@ -58,7 +58,7 @@ class MqttMap extends Component {
     mqttClient = Mqtt.connect(`ws:178.62.252.50:9001`, {
 	  rejectUnauthorized: false,
 	  username: 'mobi',
-  	  password: 'mobi_user_mqtt_password',
+  	  password: 'mobi_mqtt_password',
     })
 
     mqttClient.on('connect', () => {

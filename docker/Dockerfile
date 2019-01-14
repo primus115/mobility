@@ -17,6 +17,8 @@ RUN apt-get -qq install curl
 RUN apt-get update && apt-get -qq install \
     wget \
     git \
+    vim \
+    nano \
     build-essential \
 	sumo \
 	sumo-tools \

@@ -52,7 +52,7 @@ Deployed smart contracts on the Rinkeby Ethereum test net:
 **1.2 Second layer platform "constructor" contracts**  
 For now **MobilityAccount.sol** is the only one. If you want to offer a transportation services (like a taxi driver or a owner of the autonomous vehicle) than you will create new instance of this contract, with the help of the MobilityRegistry contract, where new instances of this contract are deployed. In the contract are defined functions like payRide, setDistance, getDistance, getIsPaid, price...  
 
-**On this layer additional smart contracts can be created, that expands transportation segment also to other segments, like gas station segment (e.g. Tank&Drive&Bonuses), insurance segment (e.g. publish data get discount), used cars market (e.g. publish driver behaviour profile and real distances - trusted seller), autonomous vehicle manufacturing segment (e.g. publish valuable data to desired company or brokerage company), car manufacturers segment (e.g. publish feedback data for specific vehicle model for the instant closed manufacturing loop & get bonuses or discount with new one)...**
+**On this layer additional smart contracts can be created, that expands transportation segment also to other segments, like gas station segment (e.g. Tank&Drive&Bonuses), insurance segment (e.g. publish data get discount), used cars market (e.g. publish driver behavior profile and real distances - trusted seller), autonomous vehicle manufacturing segment (e.g. publish valuable data to desired company or brokerage company), car manufacturers segment (e.g. publish feedback data for specific vehicle model for the instant closed manufacturing loop & get bonuses or discount with new one)...**
 
 **1.3 Third layer user contracts instances**  
 Here are the instaces of the deployed accounts. Owner is the wallet that created the instance with the **MobilityRegistry** contract. Different DApps interact with specific account through this instance contract. Founds that collects on the contract with doing transportation service, can be tranfered at any time to any wallet only by the owner of the contract instance.  
@@ -118,17 +118,26 @@ Ocean Protocol is an ecosystem for sharing data and services. It provides a toke
 Retrived from (https://oceanprotocol.com/#project).
 
 ### Usage  
-Because there are many different tools used with the platform (many dependencies) is the fastest way to try out the whole package, with the help of Docker.   
+#### Setup MetaMask and open web application
+For interacting with the SUMO GUI, you will need ethereum wallet. Preferably MetaMask. In your browser (Chrome was tested):
+1. [Install MetaMask plugin, swithc to the Rinkeby network and get some ether](https://www.youtube.com/watch?v=L88-x7EQi8g)   
+p.s. unfortunately it is not real ether, but very good for generously testig DApps :)   
+2. In the same browser with loged in to the MetaMask, open up my online DApp:  
+www.mobi-dapp.com   
+(I deployed react aplication to the the online server. But if you wish to further upgrade or test the web application, you can manually download the project, or do the ```git pull https://github.com/primus115/mobility.git```, cd to the folder /home/mobi/mobi/web/mqttMaps/ and install dependecies with ```npm install``` and finally start the server with ```npm start```. Another way is to spin a new container with the port forwarding 80:80 and from there install dependencies and start the server. Contact me for the client mqtt password if you don't set your own mqtt broker)  
 
+#### Docker install and preparing the image
+Because there are many different tools used with the platform (many dependencies) is the fastest way to try out the whole package, with the help of Docker.   
+The fastest way to do is to use the Docker.  
 Docker runs processes in isolated containers. A container is a process which runs on a host. When an operator executes docker run, the container process that runs is isolated in that it has its own file system, its own networking, and its own isolated process tree separate from the host.  
 
-It is awailable for Linux and Windows, but as we start a simulation, gui is opened and for display sharing in Windows, there are some additional X Server installation required that I will not cover here.  
+It is awailable for Linux and Windows, but as we start developed mobility simulation, GUI is opened and for display sharing in Windows, there are some additional X Server installation required that I will not cover here.  
 
-**So lets begin on Linux machine:**  
+**So let's begin on a Linux machine:**  
 Prerequisite is installed Docker:  
 Do a whole Step1 from: (https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)  
 
-Now you hawe two options:  
+Now you have two options:  
 **ONE:** Pull the docker image from the (https://cloud.docker.com/repository/docker/primus115/docker-mobi):   
 1. Create an account on the https://hub.docker.com/)  
 2. open the terminal and do the Docker login   
@@ -149,30 +158,60 @@ touch Dockerfile
 ```  
 3. Copy whole content of the file: [Dockerfile](./docker/Dockerfile)   
 4. On your local machine open previously created file "Dockerfile"
-5. Past previously copied content and past it to the local file, save and close the editor  
+5. Past in previously copied content and past it to the local file, save and close the editor  
 6. Build a Docker image from a Dockerfile:  
 In the folder where the Dockerfile was created, run a command:  
 ```bash
 sudo docker build - < Dockerfile -t docker-mobi
 ```  
 
-**Run the container with shared display:** (gui will be started in container and display will be shared with the host system)   
-1. First check if you you have the image with docker images
-2. Run the command: docker .........
-Now you see something like: (user)@123123123, that means you are in a running container
-3. Run the simulation with the command: python runner.py
-4. 
+#### Start a simulation  
+In the web application, if you click on "Request a Ride!", nothing happens. This is becouse there is no clients (taxi drivers) connected to the platform. That is why, we will run the simulation, where we will simulate taxi drivers.  
 
 
-Demo DApp: http://www.mobi-dapp.com
+**Run the container with shared display:**  
+(As we start the simulation sctipt, GUI will be started in the container and display will be shared with the host system)   
+
+1. Run the command:   
+```bash
+sudo docker run -it --rm\
+    --env="DISPLAY" \
+    --volume="/etc/group:/etc/group:ro" \
+    --volume="/etc/passwd:/etc/passwd:ro" \
+    --volume="/etc/shadow:/etc/shadow:ro" \
+    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    --user=mobi \
+    docker-mobi \
+    bash
+```   
+Now, in the treminal you see something like: ```user@container_id:/home/mobi/mobi$```, that means you are in a running container.
+3. Open a 
+3. Run the simulation with the command:  
+```bash
+python runner.py
+```
+4. GUI is opend:   
+![](./pictures/gui.png "SUMO GUI")  
+5. Decrease the delay (arrow 1) to: ```500```  
+6. Press "start" button (arrow 2)
+7. Now if you move back to the web app, and if you click on "Request a Ride!". You get back a list of avalable taxi drivers in the form "taxi_name: duration_from_taxi_location_to_you_plus_to_final_destination"   
+8. Select one Taxi  
+9. When you choose a Taxi, ethereum transaction happens. Selected car wants to write on his instance of the MobilityAccount smart contract (it sets a distance that futher defines cost of the transportation). For that it needs a private key, that is encrypted. So navigate back to the terminal where simulation was started, where you will see ```Enter the password for decryption:```   
+**For the purpose of the competition "Mobi grant challenge" please contact me on my email: za.primoz@gmail.com, as I don't want to share private keys on a public repository. (one transaction can empty the account:) )**   
+10. It takes a couple of seconds and the transaction is confirmed. Simulation also sends a message to the web app, with the payment details. If you are using MetaMask, notifications appears.   
+![](./pictures/pay.png "Payment request")  
+11. Click on "Confirm"
 
 
-### Video
+
+If you have trubles setting up the environment and you are more used to Virtual machine like VirtualBox, than contact me and I will set one up for you.
+
+### Video  
+Here is a video of testing the application with the sumo simulation.
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=OEyzdEqacko" target="_blank"><img src="http://img.youtube.com/vi/OEyzdEqacko/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
-
-### TO-DO
 
 
 ### Author

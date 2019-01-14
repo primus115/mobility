@@ -307,10 +307,10 @@ def mqttOnMessage(client, userdata, msg):
 
 def main():
     global mqttClient
-    mqttClient = mqtt.Client("mobiClient")
+    mqttClient = mqtt.Client("mobiClient_"+str(random.randint(1, 1000)))
     mqttClient.on_connect = mqttOnConnect
     mqttClient.on_message = mqttOnMessage
-    client.username_pw_set("mobi", mqttPasswd);
+    mqttClient.username_pw_set("mobi", mqttPasswd);
 
     mqttClient.connect("178.62.252.50", port=1883, keepalive=60)
 
