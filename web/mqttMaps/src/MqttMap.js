@@ -4,7 +4,7 @@ import Marker from 'pigeon-marker/react'
 import Overlay from 'pigeon-overlay'
 import man from './img/baseline.png'
 import Mqtt from 'mqtt'
-import { Button, Dropdown, List, Message, Form } from 'semantic-ui-react'
+import { Container, Button, Dropdown, List, Message, Form } from 'semantic-ui-react'
 import web3 from './ethereum/web3';
 import Account from './ethereum/account';
 
@@ -183,9 +183,9 @@ class MqttMap extends Component {
 	  const { pos, appPos } = this.state
 
   	  return (
+		<Container>
   		<div>
-  		  <h3>Messages</h3>
- 			<div>map</div>
+  		  <h3>Ride sharing DApp</h3>
   			<Map center={[46.0438, 14.4947]} zoom={14} width={1200} height={600}>
   				<Marker anchor={[pos.lat, pos.lon]} payload={1} />
   			    <Overlay anchor={[appPos.lat, appPos.lon]} offset={[30, 5]}>
@@ -208,6 +208,7 @@ class MqttMap extends Component {
 				</Form>
 			</div>
   		</div>
+		</Container>
   	  )
   }
 }

@@ -92,7 +92,7 @@ DApp (Decentralized application), that can be used in two modes:
  
 	2.1 Mobile application - real user (idea - not developed yet)   
 	Use application in the mode where the app listens to the published transportation requests. The app automatically response with the distance and the price. If you get chosen, do the transportation service.   
-Long term goal is to have only autonomous vehicles in the transportation services. But in reality there will be a symbiosis with our cars and fully autonomous cars. And the app can help us to build the next generation transportation services and optimised travell routes (with the help of AI and IoT for smart traffic ligths). Besides the offer of the transportation services is also idea to have optimized navigation systems that we are already using it.   
+Long term goal is to have only autonomous vehicles in the transportation services. But in reality there will be a symbiosis between our cars and fully autonomous cars. And the app can help us to build the next generation transportation services and optimised travell routes (with the help of AI and IoT for smart traffic ligths). Besides the offer of the transportation services is also idea to have optimized navigation systems that we are already using it.   
 	2.2 Embedded application - autonomous vehicle (developed in the simulation)  
 	Application can be used for connecting autonomous vehicles with the mobility platform. Vehicle can get get route request, send the command to the navigation system, pick up a passenger or some item, do payment request and automatically when the payment is done finish the transportation service.  
 
