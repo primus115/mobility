@@ -76,7 +76,7 @@ DApp (Decentralized application), that can be used in two modes:
 	2.1 Mobile application (real user)  
 	2.2 Embedded application (autonomous vehicle)  
 
-**1. Requesting a transportation**  
+**Requesting a transportation**  
 
 	1.1 Mobile application (working prototype)   
 	Enter destination and from available offers pick the one that is fastest or cheapest.
@@ -88,7 +88,7 @@ DApp (Decentralized application), that can be used in two modes:
 	This can be different logistic application that needs transfers of any kind of goods. Probably MobilityAccount contract must be upgraded in some way that transporter stakes some ether, which is released back to him when specific rules are setisfied.
 
 	
-**2. Offer a transportation**   
+**Offer a transportation**   
  
 	2.1 Mobile application - real user (idea - not developed yet)   
 	Use application in the mode where the app listens to the published transportation requests. The app automatically response with the distance and the price. If you get chosen, do the transportation service.   
@@ -100,7 +100,7 @@ Long term goal is to have only autonomous vehicles in the transportation service
 SUMO is an open source, highly portable, microscopic and continuous traffic simulation package designed to handle large road networks. It is mainly developed by employees of the Institute of Transportation Systems at the German Aerospace Center. SUMO is open source, licensed under the EPLv2.  
 Sumo was chosen because of quick testing and quick evaluation of developed mobility platform features (on application layer and blockchain layer). In that way automated testing can be developed. It also supports any desired city plan import. For the demonstration I imported a map of Ljubljana, the capital of Slovenia. You can define speed of simulation, custom or repeatable vehicle trips. Additionally the simulation can be use for producing a lot of traffic data that is needed by the sophisticaded AI and machine learning tools, for traffic optimization.  
 
-#### 3. MQTT protocol (used by the DApps and simulation)  
+#### 4. MQTT protocol (used by the DApps and simulation)  
 MQTT is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport.    
 It is ideal for publishing location data with high frequency. As such was also used as a communication mechanism of DApps, for publishing requests or responses and listening for requestst and responses.  
 As it is pusblish/subscribe based, there is no need for some database with all DApps users. Requirements are that DApp must follow topic creating rules. For example, all requests for specific city based are published to the topic: "req/country_name/city_name" (e.g. "req/slovenia/ljubljana). So DApp of the transporter subcribes to the topic "req/country_name/city_name/#" (# is multi-level wild card, so can be also used like "req/country_name/#" for offering transportation across whole country).  
@@ -108,17 +108,17 @@ TODO:
 Exact project based topics specification
 
 
-#### 4. Artificial intelligence (not developed yet)   
+#### 5. Artificial intelligence (not developed yet)   
 Idea is to offer and make a test polygon with the traffic simulation tool.  
 Make a platform layer for developing different AI based optimization algorithms, that can be used for example to optimize traffic.   
 Develpment can start with implementing open-source tool Flow. Flow is a traffic control benchmarking framework. It provides a suite of traffic control scenarios (benchmarks), tools for designing custom traffic scenarios, and integration with deep reinforcement learning and traffic microsimulation libraries.  Retrieved from (https://flow-project.github.io/index.html).
 
-#### 5. Data market - Ocean protocol (not developed yet)   
+#### 6. Data market - Ocean protocol (not developed yet)   
 Ocean Protocol is an ecosystem for sharing data and services. It provides a tokenized service layer that exposes data, storage, compute and algorithms for consumption with a set of deterministic proofs on availability and integrity that serve as verifiable service agreements. There is staking on services to signal quality, reputation and ward against Sybil Attacks. Ocean Protocol helps to unlock data, particularly for AI. It is designed for scale and uses blockchain technology that allows data to be shared and sold in a safe, secure and transparent manner.  
 Retrived from (https://oceanprotocol.com/#project).
 
 ### Usage  
-#### Setup MetaMask and open web application
+#### 1. Setup MetaMask and open web application
 For interacting with the SUMO GUI, you will need ethereum wallet. Preferably MetaMask. In your browser (Chrome was tested):
 1. [Install MetaMask plugin, swithc to the Rinkeby network and get some ether](https://www.youtube.com/watch?v=L88-x7EQi8g)   
 p.s. unfortunately it is not real ether, but very good for generously testig DApps :)   
@@ -126,14 +126,14 @@ p.s. unfortunately it is not real ether, but very good for generously testig DAp
 www.mobi-dapp.com   
 (I deployed react aplication to the the online server. But if you wish to further upgrade or test the web application, you can manually download the project, or do the ```git pull https://github.com/primus115/mobility.git```, cd to the folder /home/mobi/mobi/web/mqttMaps/ and install dependecies with ```npm install``` and finally start the server with ```npm start```. Another way is to spin a new container with the port forwarding 80:80 and from there install dependencies and start the server. Contact me for the client mqtt password if you don't set your own mqtt broker)  
 
-#### Docker install and preparing the image
+#### 2. Docker install and preparing the image
 Because there are many different tools used with the platform (many dependencies) is the fastest way to try out the whole package, with the help of Docker.   
 The fastest way to do is to use the Docker.  
 Docker runs processes in isolated containers. A container is a process which runs on a host. When an operator executes docker run, the container process that runs is isolated in that it has its own file system, its own networking, and its own isolated process tree separate from the host.  
 
 It is awailable for Linux and Windows, but as we start developed mobility simulation, GUI is opened and for display sharing in Windows, there are some additional X Server installation required that I will not cover here.  
 
-**So let's begin on a Linux machine:**  
+#### So let's begin on a Linux machine:   
 Prerequisite is installed Docker:  
 Do a whole Step1 from: (https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)  
 
@@ -165,11 +165,11 @@ In the folder where the Dockerfile was created, run a command:
 sudo docker build - < Dockerfile -t docker-mobi
 ```  
 
-#### Start a simulation  
+#### 3. Start a simulation  
 In the web application, if you click on "Request a Ride!", nothing happens. This is becouse there is no clients (taxi drivers) connected to the platform. That is why, we will run the simulation, where we will simulate taxi drivers.  
 
 
-**Run the container with shared display:**  
+#### Run the container with shared display:    
 (As we start the simulation sctipt, GUI will be started in the container and display will be shared with the host system)   
 
 1. Run the command:   
@@ -185,12 +185,14 @@ sudo docker run -it --rm\
     docker-mobi \
     bash
 ```   
-Now, in the treminal you see something like: ```user@container_id:/home/mobi/mobi$```, that means you are in a running container.
-3. Open a 
-3. Run the simulation with the command:  
+Now, in the treminal you see something like: ```user@container_id:/home/mobi/mobi$```, that means you are in a running container.  
+2. Run the simulation with the command:    
 ```bash
 python runner.py
 ```
+3. In the terminal you see: ```Enter the password for mqtt mobi user:```   
+**Please send me a mail on za.primoz@gmail.com, and I will send you back the password. It's because the repository is public.**   
+Write the password and press "Enter".   
 4. GUI is opend:   
 ![](./pictures/gui.png "SUMO GUI")  
 5. Decrease the delay (arrow 1) to: ```500```  
@@ -202,13 +204,12 @@ python runner.py
 10. It takes a couple of seconds and the transaction is confirmed. Simulation also sends a message to the web app, with the payment details. If you are using MetaMask, notifications appears.   
 ![](./pictures/pay.png "Payment request")  
 11. Click on "Confirm"
-
-
+12. Again it takes a couple of seconds, and when the taxi recives the paymant, transportation begins.   
 
 If you have trubles setting up the environment and you are more used to Virtual machine like VirtualBox, than contact me and I will set one up for you.
 
-### Video  
-Here is a video of testing the application with the sumo simulation.
+### Video   
+Here is a video of testing the application.   
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=OEyzdEqacko" target="_blank"><img src="http://img.youtube.com/vi/OEyzdEqacko/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
