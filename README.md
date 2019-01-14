@@ -26,7 +26,9 @@ Web DApp sources: [./web/mqttMaps](./web/mqttMaps/)
 - main app: [MqttMap.js](./web/mqttMaps/src/MqttMap.js)  
 
 Ethereum sources: [./web/mqttMaps/src/ethereum/](./web/mqttMaps/src/ethereum)  
-- contracts: [DecentralizedMobilitySystem_V01.sol](./web/mqttMaps/src/ethereum/contracts/DecentralizedMobilitySystem_V01.sol)
+- contracts: [DecentralizedMobilitySystem_V01.sol](./web/mqttMaps/src/ethereum/contracts/DecentralizedMobilitySystem_V01.sol)  
+
+Docker: [Dockerfile](./docker/Dockerfile)   
 
 ### Arhitecture
 ![](./pictures/Mobility_Platform_Architecture.png "Mobility Platform Architecture")
@@ -63,9 +65,9 @@ Every contract has the funciton ownerRetriveDonations(address receiver), that ca
 For the monetization testing was implemented functionality in the MobilityAccount that sends received_amount/10 to the MobilityStorage contract, the rest stays on the MobilityAccount contract instance.   
 At the moment the amount the price for transportation request is hardcoded in the MobilityAccount contract (0.01 ether/km). But can be upgraded that can be changed by the owner of the contract instance.  
 
-\*\* If there is a platform desire to have a very small percentage income from the transactions, than upgrade is needed. Becouse of the immutability reasons, reciving function must be implemented in the first layer contract, which forwards calculated amount to the MobilityAccount contract instance. sends whole amount to MobilityRegistry contract and the defined percentage is returend.  
+\*\* If there is a platform desire to have a very small percentage income from the transactions, than upgrade is needed. Becouse of the immutability reasons, reciving function must be implemented in the first layer contract, which forwards calculated amount to the MobilityAccount contract instance.   
 
-#### 2. DApp (partially developed)
+#### 2. DApp (developed 1.1 and 2.2)
 DApp (Decentralized application), that can be used in two modes:  
 1. Requesting a transportation   
 	1.1 Mobile application  
@@ -82,12 +84,13 @@ DApp (Decentralized application), that can be used in two modes:
 	- google.maps api requests for cusotm destinations  
 	- Register new account for the mobility platform  
 
-	1.2 Buisiness application (idea - not developed) 
+	1.2 Buisiness application (idea - not developed yet) 
 	This can be different logistic application that needs transfers of any kind of goods. Probably MobilityAccount contract must be upgraded in some way that transporter stakes some ether, which is released back to him when specific rules are setisfied.
 
 	
 **2. Offer a transportation**   
-	2.1 Mobile application - real user (idea - not developed)   
+ 
+	2.1 Mobile application - real user (idea - not developed yet)   
 	Use application in the mode where the app listens to the published transportation requests. The app automatically response with the distance and the price. If you get chosen, do the transportation service.   
 Long term goal is to have only autonomous vehicles in the transportation services. But in reality there will be a symbiosis with our cars and fully autonomous cars. And the app can help us to build the next generation transportation services and optimised travell routes (with the help of AI and IoT for smart traffic ligths). Besides the offer of the transportation services is also idea to have optimized navigation systems that we are already using it.   
 	2.2 Embedded application - autonomous vehicle (developed in the simulation)  
@@ -98,18 +101,68 @@ SUMO is an open source, highly portable, microscopic and continuous traffic simu
 Sumo was chosen because of quick testing and quick evaluation of developed mobility platform features (on application layer and blockchain layer). In that way automated testing can be developed. It also supports any desired city plan import. For the demonstration I imported a map of Ljubljana, the capital of Slovenia. You can define speed of simulation, custom or repeatable vehicle trips. Additionally the simulation can be use for producing a lot of traffic data that is needed by the sophisticaded AI and machine learning tools, for traffic optimization.  
 
 #### 3. MQTT protocol (used by the DApps and simulation)  
-MQTT (Message Queuing Telemetry Transport) is an ISO standard (ISO/IEC PRF 20922) publish-subscribe-based messaging protocol. It works on top of the TCP/IP protocol. It is designed for connections with remote locations where a "small code footprint" is required or the network bandwidth is limited.  
-It is ideal for publishing location data with high frequency. 
+MQTT is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport.    
+It is ideal for publishing location data with high frequency. As such was also used as a communication mechanism of DApps, for publishing requests or responses and listening for requestst and responses.  
+As it is pusblish/subscribe based, there is no need for some database with all DApps users. Requirements are that DApp must follow topic creating rules. For example, all requests for specific city based are published to the topic: "req/country_name/city_name" (e.g. "req/slovenia/ljubljana). So DApp of the transporter subcribes to the topic "req/country_name/city_name/#" (# is multi-level wild card, so can be also used like "req/country_name/#" for offering transportation across whole country).  
+TODO:  
+Exact project based topics specification
 
 
-#### 4. Artificial intelligence (not developed)  
+#### 4. Artificial intelligence (not developed yet)   
+Idea is to offer and make a test polygon with the traffic simulation tool.  
+Make a platform layer for developing different AI based optimization algorithms, that can be used for example to optimize traffic.   
+Develpment can start with implementing open-source tool Flow. Flow is a traffic control benchmarking framework. It provides a suite of traffic control scenarios (benchmarks), tools for designing custom traffic scenarios, and integration with deep reinforcement learning and traffic microsimulation libraries.  Retrieved from (https://flow-project.github.io/index.html).
 
-
-#### 5. Data market - Ocean protocol (not developed)  
-
+#### 5. Data market - Ocean protocol (not developed yet)   
+Ocean Protocol is an ecosystem for sharing data and services. It provides a tokenized service layer that exposes data, storage, compute and algorithms for consumption with a set of deterministic proofs on availability and integrity that serve as verifiable service agreements. There is staking on services to signal quality, reputation and ward against Sybil Attacks. Ocean Protocol helps to unlock data, particularly for AI. It is designed for scale and uses blockchain technology that allows data to be shared and sold in a safe, secure and transparent manner.  
+Retrived from (https://oceanprotocol.com/#project).
 
 ### Usage  
-Docker
+Because there are many different tools used with the platform (many dependencies) is the fastest way to try out the whole package, with the help of Docker.   
+
+Docker runs processes in isolated containers. A container is a process which runs on a host. When an operator executes docker run, the container process that runs is isolated in that it has its own file system, its own networking, and its own isolated process tree separate from the host.  
+
+It is awailable for Linux and Windows, but as we start a simulation, gui is opened and for display sharing in Windows, there are some additional X Server installation required that I will not cover here.  
+
+**So lets begin on Linux machine:**  
+Prerequisite is installed Docker:  
+Do a whole Step1 from: (https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)  
+
+Now you hawe two options:  
+**ONE:** Pull the docker image from the (https://cloud.docker.com/repository/docker/primus115/docker-mobi):   
+1. Create an account on the https://hub.docker.com/)  
+2. open the terminal and do the Docker login   
+```bash
+sudo docker login
+```
+3. Enter requested data (username and password)
+4. Execute command:  
+```bash
+docker pull primus115/docker-mobi
+```
+
+**TWO:** Copy Dockerfile and build image with docker:
+1. Open up a terminal (ctrl+alt+t)
+2. Create a file "Dockerfile" with the command:  
+```bash
+touch Dockerfile
+```  
+3. Copy whole content of the file: [Dockerfile](./docker/Dockerfile)   
+4. On your local machine open previously created file "Dockerfile"
+5. Past previously copied content and past it to the local file, save and close the editor  
+6. Build a Docker image from a Dockerfile:  
+In the folder where the Dockerfile was created, run a command:  
+```bash
+sudo docker build - < Dockerfile -t docker-mobi
+```  
+
+**Run the container with shared display:** (gui will be started in container and display will be shared with the host system)   
+1. First check if you you have the image with docker images
+2. Run the command: docker .........
+Now you see something like: (user)@123123123, that means you are in a running container
+3. Run the simulation with the command: python runner.py
+4. 
+
 
 Demo DApp: http://www.mobi-dapp.com
 
