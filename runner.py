@@ -151,7 +151,12 @@ def stateAction(state):
         route2 = traci.simulation.findRoute(appEdgeID[0],destEdgeID[0]).edges
         route2time = 0
         for edge in route2 :
-           route2time += traci.edge.getTraveltime(edge)
+            mtime2 = traci.edge.getTraveltime(edge)
+            if (mtime2 > 20.0):
+                print("STRANGE EST. TIME FOR NODE: {}!!!!!!!!!!!!!!!!!!!!!!!!!!".format(edge))
+                print(mtime2)
+                mtime2 = 0.0
+            route2time += mtime2
 
         for car in ["taxi1", "taxi2", "taxi3"]:
             print("For the vehicle :{}".format(car))
@@ -162,7 +167,7 @@ def stateAction(state):
             route1time = 0
             for edge in route1 :
                 mtime = traci.edge.getTraveltime(edge)
-                if (mtime > 40.0):
+                if (mtime > 20.0):
                     print("STRANGE EST. TIME FOR NODE: {}!!!!!!!!!!!!!!!!!!!!!!!!!!".format(edge))
                     print(mtime)
                     mtime = 0.0
