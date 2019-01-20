@@ -34,7 +34,7 @@ RUN cd /home/$MOBI_USER && curl -sL https://deb.nodesource.com/setup_10.x -o nod
 RUN cd /home/$MOBI_USER && git clone https://github.com/primus115/mobility.git
 
 # Go to web folder and install dependencies
-RUN cd /home/$MOBI_USER/mobi/web/mqttMaps/ && npm install
+RUN cd /home/$MOBI_USER/mobility/web/mqttMaps/ && npm install
 
 # python 3
 RUN apt-get install -y python3-pip python3-dev \
