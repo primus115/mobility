@@ -31,7 +31,7 @@ RUN cd /home/$MOBI_USER && curl -sL https://deb.nodesource.com/setup_10.x -o nod
 && bash nodesource_setup.sh && apt-get -qq install nodejs
 
 # Clone mobility repository
-RUN cd /home/$MOBI_USER && git clone https://primus115@bitbucket.org/primus115/mobi.git
+RUN cd /home/$MOBI_USER && git clone https://github.com/primus115/mobility.git
 
 # Go to web folder and install dependencies
 RUN cd /home/$MOBI_USER/mobi/web/mqttMaps/ && npm install
