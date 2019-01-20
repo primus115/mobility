@@ -49,6 +49,6 @@ RUN pip3 install web3
 # for finding sumo modules
 ENV SUMO_HOME=/usr/share/sumo/
 
-WORKDIR /home/$MOBI_USER/mobi/
+WORKDIR /home/$MOBI_USER/mobility/
 
 EXPOSE 3000
