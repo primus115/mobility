@@ -226,6 +226,11 @@ Here is a video of testing the application.
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=qfzP7N3qJiA" target="_blank"><img src="http://img.youtube.com/vi/qfzP7N3qJiA/0.jpg" 
 alt="demo video" width="240" height="180" border="10" /></a>
 
+### Contributing
+If you want to join the project please contact me:  
+za.primoz@gmail.com   
+or  
+[@115Primus](https://twitter.com/115primus)  
 
 ### Author
 Primož Zajec  
