@@ -229,8 +229,9 @@ alt="demo video" width="240" height="180" border="10" /></a>
 ### Contributing
 If you want to join the project please contact me:  
 za.primoz@gmail.com   
-or  
 [@115Primus](https://twitter.com/115primus)  
+or join the community:  
+<http://multiversecoders.com>  
 
 ### Author
 Primož Zajec  
