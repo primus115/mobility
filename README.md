@@ -1,7 +1,6 @@
 # Mobility Platform  
 
 ### About the project
-Inspired from and for the [Mobi Grand Challenge](https://mobihacks.devpost.com/).  
 Goal is to make a mobility platform what will represent the point where different technologies can intersect. It can be used for testing, simulation and production.   
 
 First stage is to confirm the desired interaction between different technologies.  
